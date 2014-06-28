@@ -1,0 +1,10 @@
+name: Bounder
+main: com.mcmiddleearth.boundhelper.BounderHelper
+version: 0.1
+description: makes OBing a player easier
+commands:
+  ob:
+    description: OathBreaker a player
+    usage: |
+            /ob <player>
+    
