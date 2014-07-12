@@ -54,8 +54,11 @@ public class DBmanager {
     public static boolean load(String pName){
         File save = new File(DataFile + System.getProperty("file.separator") + pName + ".obdat");
         if(!save.exists())
-            return false;
+            return false;                                   
         
         return true;
+    }
+    public static void archive(String pName){
+        
     }
 }

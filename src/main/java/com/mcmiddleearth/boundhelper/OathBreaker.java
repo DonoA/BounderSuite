@@ -6,6 +6,8 @@
 
 package com.mcmiddleearth.boundhelper;
 
+import org.bukkit.Location;
+
 /**
  *
  * @author Donovan
@@ -13,9 +15,15 @@ package com.mcmiddleearth.boundhelper;
 public class OathBreaker {
     public String Destination;
     public int severity;
-    public boolean isCurrent;
-    public int lvl;
-    public OathBreaker(int sev){
+//    public String rank;
+//    public int lvl;
+    public String pName;
+    public OathBreaker(int sev, String pName){ //, String rank
         this.Destination = LocationIndex.genLoc(sev);
+        this.pName = pName;
+//        this.rank = rank;
+    }
+    public boolean isDone(Location loc){
+//        if
     }
 }
