@@ -6,5 +6,5 @@ commands:
   ob:
     description: OathBreaker a player
     usage: |
-            /ob <player>
+            /ob <player> <severity>
     
