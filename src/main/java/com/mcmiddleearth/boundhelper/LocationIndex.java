@@ -20,7 +20,7 @@ public class LocationIndex {
     
     
     
-    public static Rectangle2D getLocation(String name){
+    public static int[][] getLocation(String name){
         int Boundx[] = {0,0};
         int Boundz[] = {0,0};
         if(name.equalsIgnoreCase("bree")){
@@ -115,9 +115,7 @@ public class LocationIndex {
 //            Boundz[0] = 
 //            Boundz[1] = 
 //        }
-        
-        
-        return null;
+        return new int[][] {{Boundx[0],Boundx[1]},{Boundz[0],Boundz[1]}};
     }
     public static String genLoc(int sev){
         Random randomGenerator = new Random();

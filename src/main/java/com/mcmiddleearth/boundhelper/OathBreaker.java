@@ -24,6 +24,7 @@ public class OathBreaker {
 //        this.rank = rank;
     }
     public boolean isDone(Location loc){
-//        if
+//        if(LocationIndex.getLocation(Destination))
+        return false;
     }
 }
