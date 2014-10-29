@@ -4,12 +4,11 @@
  * and open the template in the editor.
  */
 
-package com.mcmiddleearth.boundhelper;
+package com.mcmiddleearth.boundhelper.DBamanger;
 
-import java.awt.Polygon;
-import java.awt.geom.Rectangle2D;
-import java.util.Arrays;
-import java.util.List;
+import com.mcmiddleearth.boundhelper.Destination;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -18,7 +17,9 @@ import java.util.Random;
  */
 public class LocationIndex {
     
+    public static HashMap<String, Destination> Destinations = new HashMap<>();
     
+    private static HashMap<Integer, ArrayList<String>> DesBySev = new HashMap<>();
     
     public static int[][] getLocation(String name){
         int Boundx[] = {0,0};
@@ -109,23 +110,14 @@ public class LocationIndex {
             Boundz[0] = -1568;
             Boundz[1] = -1121;
         }
-//        else if(name.equalsIgnoreCase("")){
-//            Boundx[0] = 
-//            Boundx[1] = 
-//            Boundz[0] = 
-//            Boundz[1] = 
-//        }
         return new int[][] {{Boundx[0],Boundx[1]},{Boundz[0],Boundz[1]}};
     }
-    public static String genLoc(int sev){
+    public static void loadLocs(){
+        
+    }
+    public static Destination genLoc(int sev){
         Random randomGenerator = new Random();
-        if(sev == 1){
-            List<String> firstLocs = Arrays.asList(new String[] {"michel delving", "fornost", "lothlorien", "os-in-edhil", "rivendell", "moria west gate", "bree"});
-            return firstLocs.get(randomGenerator.nextInt(firstLocs.size()));
-        }else if(sev == 2){
-            List<String> secondLocs = Arrays.asList(new String[] {"isengard", "minas tirith", "dead marshes", "helms deep", "farbad", "medoras", "edoras", "osgo", "amon hen"});
-            return secondLocs.get(randomGenerator.nextInt(secondLocs.size()));
-        }
-        return " error ";
+        String Des = new ArrayList<String>(DesBySev.get(sev)).get(randomGenerator.nextInt(DesBySev.get(sev).size()-1));
+        return Destinations.get(Des);
     }
 }

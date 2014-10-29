@@ -6,6 +6,11 @@
 
 package com.mcmiddleearth.boundhelper;
 
+import com.mcmiddleearth.boundhelper.DBamanger.LocationIndex;
+import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 /**
@@ -13,18 +18,28 @@ import org.bukkit.Location;
  * @author Donovan
  */
 public class OathBreaker {
-    public String Destination;
-    public int severity;
-//    public String rank;
-//    public int lvl;
-    public String pName;
-    public OathBreaker(int sev, String pName){ //, String rank
+    @Getter @Setter
+    private Destination Destination;
+    
+    @Getter @Setter
+    private String rank;
+    
+    @Getter @Setter
+    private String pName;
+    
+    @Getter @Setter
+    private int Sev;
+    
+    @Getter @Setter
+    private Date fin;
+    
+    public OathBreaker(int sev, String pName, String rank){
         this.Destination = LocationIndex.genLoc(sev);
         this.pName = pName;
-//        this.rank = rank;
+        this.rank = rank;
+        this.Sev = sev;
     }
     public boolean isDone(Location loc){
-//        if(LocationIndex.getLocation(Destination))
-        return false;
+        return Destination.inDes(Bukkit.getPlayer(pName).getLocation());
     }
 }
