@@ -17,7 +17,7 @@
  * 
  */
 
-package com.mcmiddleearth.boundhelper;
+package com.mcmiddleearth.boundsuite;
 
 import lombok.Getter;
 import lombok.Setter;

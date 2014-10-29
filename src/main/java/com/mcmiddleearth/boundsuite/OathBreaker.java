@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-package com.mcmiddleearth.boundhelper;
+package com.mcmiddleearth.boundsuite;
 
-import com.mcmiddleearth.boundhelper.DBamanger.LocationIndex;
+import com.mcmiddleearth.boundsuite.DBamanger.LocationIndex;
 import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;

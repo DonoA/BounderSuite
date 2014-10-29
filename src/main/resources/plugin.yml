@@ -1,5 +1,5 @@
-name: Bounder
-main: com.mcmiddleearth.boundhelper.BounderHelper
+name: Bounder Suite
+main: com.mcmiddleearth.boundsuite.BounderSuite
 version: 0.1
 description: makes OBing a player easier
 commands:
@@ -7,4 +7,8 @@ commands:
     description: OathBreaker a player
     usage: |
             /ob <player> <severity>
+  done:
+    description: finish your OB
+    usage: |
+            /done
     

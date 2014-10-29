@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-package com.mcmiddleearth.boundhelper;
+package com.mcmiddleearth.boundsuite;
 
-import com.mcmiddleearth.boundhelper.DBamanger.LocationIndex;
+import com.mcmiddleearth.boundsuite.DBamanger.LocationIndex;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -17,8 +17,8 @@ import org.bukkit.plugin.java.JavaPlugin;
  *
  * @author Donovan
  */
-public class BounderHelper extends JavaPlugin{
-    public static BounderHelper plugin;
+public class BounderSuite extends JavaPlugin{
+    public static BounderSuite plugin;
     
     @Getter @Setter
     private World MainWorld;
@@ -37,5 +37,4 @@ public class BounderHelper extends JavaPlugin{
     public void onDisable(){
         
     }
-    
 }

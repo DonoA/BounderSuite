@@ -17,9 +17,9 @@
  * 
  */
 
-package com.mcmiddleearth.boundhelper;
+package com.mcmiddleearth.boundsuite;
 
-import com.mcmiddleearth.boundhelper.DBamanger.DBmanager;
+import com.mcmiddleearth.boundsuite.DBamanger.DBmanager;
 import java.util.Date;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
