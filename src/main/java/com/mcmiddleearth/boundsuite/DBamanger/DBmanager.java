@@ -4,8 +4,10 @@
  * and open the template in the editor.
  */
 
-package com.mcmiddleearth.boundhelper;
+package com.mcmiddleearth.boundsuite.DBamanger;
 
+import com.mcmiddleearth.boundsuite.BounderSuite;
+import com.mcmiddleearth.boundsuite.OathBreaker;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -21,8 +23,8 @@ import java.util.logging.Logger;
  */
 public class DBmanager {
     public static HashMap<String, OathBreaker> OBs = new HashMap<>();
-    private static File DataFile = new File(BounderHelper.plugin.getDataFolder() + System.getProperty("file.separator") + "OBdat");
-    public static HashMap<String, Date> waitinglist = new HashMap<>();
+    
+    private static File DataFile = new File(BounderSuite.plugin.getDataFolder() + System.getProperty("file.separator") + "OBdat");
     
     public static void save(String pName){
         if(!DataFile.exists()){
@@ -61,4 +63,5 @@ public class DBmanager {
     public static void archive(String pName){
         
     }
+    
 }
