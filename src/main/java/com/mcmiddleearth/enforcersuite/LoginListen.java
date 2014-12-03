@@ -17,9 +17,9 @@
  * 
  */
 
-package com.mcmiddleearth.boundsuite;
+package com.mcmiddleearth.enforcersuite;
 
-import com.mcmiddleearth.boundsuite.DBamanger.DBmanager;
+import com.mcmiddleearth.enforcersuite.DBamanger.DBmanager;
 import java.util.Date;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-package com.mcmiddleearth.boundsuite.DBamanger;
+package com.mcmiddleearth.enforcersuite.DBamanger;
 
-import com.mcmiddleearth.boundsuite.BounderSuite;
-import com.mcmiddleearth.boundsuite.OathBreaker;
+import com.mcmiddleearth.enforcersuite.enforcerSuite;
+import com.mcmiddleearth.enforcersuite.OathBreaker;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 public class DBmanager {
     public static HashMap<String, OathBreaker> OBs = new HashMap<>();
     
-    private static File DataFile = new File(BounderSuite.plugin.getDataFolder() + System.getProperty("file.separator") + "OBdat");
+    private static File DataFile = new File(enforcerSuite.plugin.getDataFolder() + System.getProperty("file.separator") + "OBdat");
     
     public static void save(String pName){
         if(!DataFile.exists()){

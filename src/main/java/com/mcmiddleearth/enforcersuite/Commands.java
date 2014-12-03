@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-package com.mcmiddleearth.boundsuite;
+package com.mcmiddleearth.enforcersuite;
 
-import com.mcmiddleearth.boundsuite.DBamanger.DBmanager;
+import com.mcmiddleearth.enforcersuite.DBamanger.DBmanager;
 import java.util.Date;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,11 +23,11 @@ public class Commands implements CommandExecutor{
     @Override
     public boolean onCommand(CommandSender sender, Command cmd,String Label, String[] args){
         Player p = (Player) sender;
-        if(p.hasPermission("BounderHelper.ob")&&args.length>1&&cmd.getName().equalsIgnoreCase("ob")){
+        if(p.hasPermission("enforcerHelper.ob")&&args.length>1&&cmd.getName().equalsIgnoreCase("ob")){
             //demote
             if(Bukkit.getServer().getOfflinePlayer(args[0]).isOnline()){
                 Player ob = Bukkit.getPlayer(args[0]);
-                ob.teleport(BounderSuite.plugin.getMainWorld().getSpawnLocation());
+                ob.teleport(enforcerSuite.plugin.getMainWorld().getSpawnLocation());
             }
         }else if(cmd.getName().equalsIgnoreCase("done")){
             if(!DBmanager.OBs.containsKey(p.getName())){

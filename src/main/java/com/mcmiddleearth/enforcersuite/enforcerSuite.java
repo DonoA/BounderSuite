@@ -4,21 +4,21 @@
  * and open the template in the editor.
  */
 
-package com.mcmiddleearth.boundsuite;
+package com.mcmiddleearth.enforcersuite;
 
-import com.mcmiddleearth.boundsuite.DBamanger.LocationIndex;
+import com.mcmiddleearth.enforcersuite.DBamanger.LocationIndex;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
-//Oathbreaker, Thrall, Commoner, Ranger, Artist, Foreman, Artisan, Steward, Bounder, Valar
+//Oathbreaker, Thrall, Commoner, Ranger, Artist, Foreman, Artisan, Steward, enforcer, Valar
 /**
  *
  * @author Donovan
  */
-public class BounderSuite extends JavaPlugin{
-    public static BounderSuite plugin;
+public class enforcerSuite extends JavaPlugin{
+    public static enforcerSuite plugin;
     
     @Getter @Setter
     private World MainWorld;

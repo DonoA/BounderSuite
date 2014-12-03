@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-package com.mcmiddleearth.boundsuite.DBamanger;
+package com.mcmiddleearth.enforcersuite.DBamanger;
 
-import com.mcmiddleearth.boundsuite.Destination;
+import com.mcmiddleearth.enforcersuite.Destination;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;

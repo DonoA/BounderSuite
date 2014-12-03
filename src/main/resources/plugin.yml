@@ -1,5 +1,5 @@
-name: Bounder Suite
-main: com.mcmiddleearth.boundsuite.BounderSuite
+name: enforcer Suite
+main: com.mcmiddleearth.enforcersuite.enforcerSuite
 version: 0.1
 description: makes OBing a player easier
 commands:
