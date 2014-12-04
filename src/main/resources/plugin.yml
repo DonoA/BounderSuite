@@ -1,4 +1,4 @@
-name: enforcer Suite
+name: EnforcerSuite
 main: com.mcmiddleearth.enforcersuite.enforcerSuite
 version: 0.1
 description: makes OBing a player easier

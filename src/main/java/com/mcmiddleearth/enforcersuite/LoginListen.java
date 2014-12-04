@@ -19,7 +19,7 @@
 
 package com.mcmiddleearth.enforcersuite;
 
-import com.mcmiddleearth.enforcersuite.DBamanger.DBmanager;
+import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import java.util.Date;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

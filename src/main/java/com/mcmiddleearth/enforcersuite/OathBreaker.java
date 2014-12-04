@@ -6,7 +6,7 @@
 
 package com.mcmiddleearth.enforcersuite;
 
-import com.mcmiddleearth.enforcersuite.DBamanger.LocationIndex;
+import com.mcmiddleearth.enforcersuite.DBmanager.LocationIndex;
 import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;

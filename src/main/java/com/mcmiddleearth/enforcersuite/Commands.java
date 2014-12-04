@@ -6,7 +6,7 @@
 
 package com.mcmiddleearth.enforcersuite;
 
-import com.mcmiddleearth.enforcersuite.DBamanger.DBmanager;
+import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import java.util.Date;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -28,10 +28,23 @@ public class Commands implements CommandExecutor{
             if(Bukkit.getServer().getOfflinePlayer(args[0]).isOnline()){
                 Player ob = Bukkit.getPlayer(args[0]);
                 ob.teleport(enforcerSuite.plugin.getMainWorld().getSpawnLocation());
+                
+                DBmanager.save(ob.getName()); //save OB to file
+                //DBmanager.OBs.put(ob.getName(),OB);
+                
+                p.sendMessage(enforcerSuite.prefix+"You have OB'ed "+ob.getName());
+                ob.sendMessage(enforcerSuite.prefix+"You are an OB now");
             }
+            //When the OB isn't online...
+            /* 
+            else if (!Bukkit.getServer().getOfflinePlayer(args[0]).isOnline()) {
+                Bukkit.broadcastMessage(enforcerSuite.prefix+"OB ISN'T ONLINE");   
+            }
+            */
+            return true;
         }else if(cmd.getName().equalsIgnoreCase("done")){
             if(!DBmanager.OBs.containsKey(p.getName())){
-                p.sendMessage("You are not OB!");
+                p.sendMessage(enforcerSuite.prefix+"You are not OB!");
                 return true;
             }else{
                 OathBreaker ob = DBmanager.OBs.get(p.getName());

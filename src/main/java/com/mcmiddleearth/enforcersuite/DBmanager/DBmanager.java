@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.mcmiddleearth.enforcersuite.DBamanger;
+package com.mcmiddleearth.enforcersuite.DBmanager;
 
 import com.mcmiddleearth.enforcersuite.enforcerSuite;
 import com.mcmiddleearth.enforcersuite.OathBreaker;
@@ -37,7 +37,6 @@ public class DBmanager {
             saveFin.renameTo(saveFin);
         }
         
-        
         FileWriter fr = null;
         try {
             fr = new FileWriter(saveStart.toString());
@@ -45,7 +44,7 @@ public class DBmanager {
             Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
         }
         PrintWriter writer = new PrintWriter(fr);
-        writer.println("lolz");
+        writer.println(pName);
         writer.close();
         try {
             fr.close();
@@ -63,5 +62,4 @@ public class DBmanager {
     public static void archive(String pName){
         
     }
-    
 }
