@@ -42,6 +42,7 @@ public class LoginListen implements Listener{
                     DBmanager.archive(p.getName());
                 }else{
                     p.sendMessage(ChatColor.YELLOW + "You are OB until: " + ChatColor.RED + DBmanager.OBs.get(p.getName()).getFin().toString());
+                    p.sendMessage(ChatColor.YELLOW + "Your Location is " + ChatColor.RED + DBmanager.OBs.get(p.getName()).getDestination().getName());
                 }
             }
         }

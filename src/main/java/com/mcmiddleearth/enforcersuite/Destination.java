@@ -38,21 +38,18 @@ public class Destination {
     private int Xbound2;
     @Getter @Setter
     private String name;
-    @Getter @Setter
-    private int Severity;
     public Destination(int Bounds[], String name, int Sev){
         Zbound1 = Bounds[0];//small
         Zbound2 = Bounds[1];
         Xbound1 = Bounds[2];//small
         Xbound2 = Bounds[3];
         this.name = name;
-        Severity = Sev;
     }
     public Destination(){
         
     }
     public boolean inDes(Location loc){
-        return false;
+        return ((loc.getX()>this.Xbound1&&loc.getX()<this.Xbound2)&&(loc.getY()>this.Xbound1&&loc.getY()<this.Xbound2));
     }
     
 }
