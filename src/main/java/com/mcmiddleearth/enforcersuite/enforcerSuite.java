@@ -14,15 +14,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
-//Oathbreaker, Thrall, Commoner, Ranger, Artist, Foreman, Artisan, Steward, enforcer, Valar
+//Oathbreaker, Thrall, Commoner, Ranger, Artist, Foreman, Artisan, Steward, Enforcer, Valar
 /**
  *
  * @author Donovan, aaldim
  */
 public class enforcerSuite extends JavaPlugin{
-    public static enforcerSuite plugin;
+    @Getter
+    private static enforcerSuite plugin;
     
-    public static String prefix = ChatColor.GOLD +"["+ ChatColor.YELLOW +"EnforcerSuite"+ ChatColor.GOLD +"] "+ ChatColor.YELLOW;
+    @Getter
+    private static String prefix = ChatColor.GOLD +"["+ ChatColor.YELLOW +"EnforcerSuite"+ ChatColor.GOLD +"] "+ ChatColor.YELLOW;
+    
+    @Getter
+    private String FileSep = System.getProperty("file.separator");
     
     @Getter @Setter
     private World MainWorld;
@@ -40,6 +45,7 @@ public class enforcerSuite extends JavaPlugin{
     }
     @Override
     public void onDisable(){
-
+        
     }
+    
 }
