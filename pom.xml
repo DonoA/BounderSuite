@@ -2,10 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mcmiddleearth</groupId>
-    <artifactId>BoundHelper</artifactId>
+    <artifactId>EnforcerSuite</artifactId>
     <version>0.1</version>
     <packaging>jar</packaging>
+    
+    <name>EnforcerSuite</name>
+    <url>http://www.mcmiddleearth.com/</url>
+    
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
 	<plugins>
 		<plugin>
 			<groupId>org.apache.maven.plugins</groupId>
@@ -14,6 +24,38 @@
 				<source>1.7</source>
 				<target>1.7</target>
 			</configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <minimizeJar>true</minimizeJar>
+                                    <relocations>
+                                        <relocation>
+                                            <pattern>org.codehaus</pattern>
+                                            <shadedPattern>co.mcme.thegaffer.libs.org.codehaus</shadedPattern>
+                                        </relocation>
+                                        <relocation>
+                                            <pattern>org.eclipse</pattern>
+                                            <shadedPattern>co.mcme.thegaffer.libs.org.eclipse</shadedPattern>
+                                        </relocation>
+                                    </relocations>
+                                    <artifactSet>
+                                        <excludes>
+                                            <exclude>org.projectlombok:lombok</exclude>
+                                            <exclude>org.bukkit:bukkit</exclude>
+                                        </excludes>
+                                    </artifactSet>
+                                </configuration>
+                            </execution>
+                        </executions>
 		</plugin>
 	</plugins>
 </build>
@@ -45,6 +87,16 @@
             <groupId>ru.tehkode</groupId>
             <artifactId>PermissionsEx</artifactId>
             <version>1.22</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>9.1.0.v20131115</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.13</version>
         </dependency>
    </dependencies>
 </project>

@@ -19,10 +19,33 @@
 
 package com.mcmiddleearth.enforcersuite.Servlet;
 
+import lombok.Getter;
+import org.eclipse.jetty.server.Server;
+
 /**
  *
  * @author Donovan
  */
 public class Servlet {
+    @Getter
+    private Server server;
     
+    @Getter
+    private int BoundPort;
+    
+    public Servlet(int PortToBind){
+        server = new Server(PortToBind);
+        this.BoundPort = PortToBind;
+        server.setHandler(new ServletHandle());
+    }
+    
+    public void start(){
+        try{
+            if(server != null){
+                server.start();
+            }
+        } catch (Exception e) {
+            System.err.printf("Failed to start servlet on port: " + BoundPort + " : " + e.getMessage());
+        }
+    }
 }

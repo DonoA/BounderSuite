@@ -27,13 +27,13 @@ public class Commands implements CommandExecutor{
             //demote
             if(Bukkit.getServer().getOfflinePlayer(args[0]).isOnline()){
                 Player ob = Bukkit.getPlayer(args[0]);
-                ob.teleport(enforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
+                ob.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
                 
                 DBmanager.save(ob.getName()); //save OB to file
                 //DBmanager.OBs.put(ob.getName(),OB);
                 
-                p.sendMessage(enforcerSuite.getPrefix()+"You have OB'ed "+ob.getName());
-                ob.sendMessage(enforcerSuite.getPrefix()+"You are an OB now");
+                p.sendMessage(EnforcerSuite.getPrefix()+"You have OB'ed "+ob.getName());
+                ob.sendMessage(EnforcerSuite.getPrefix()+"You are an OB now");
             }
             //When the OB isn't online...
             /* 
@@ -44,7 +44,7 @@ public class Commands implements CommandExecutor{
             return true;
         }else if(cmd.getName().equalsIgnoreCase("done")){
             if(!DBmanager.OBs.containsKey(p.getName())){
-                p.sendMessage(enforcerSuite.getPrefix()+"You are not OB!");
+                p.sendMessage(EnforcerSuite.getPrefix()+"You are not OB!");
                 return true;
             }else{
                 OathBreaker ob = DBmanager.OBs.get(p.getName());

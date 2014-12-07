@@ -19,9 +19,9 @@ import org.bukkit.plugin.java.JavaPlugin;
  *
  * @author Donovan, aaldim
  */
-public class enforcerSuite extends JavaPlugin{
+public class EnforcerSuite extends JavaPlugin{
     @Getter
-    private static enforcerSuite plugin;
+    private static EnforcerSuite plugin;
     
     @Getter
     private static String prefix = ChatColor.GOLD +"["+ ChatColor.YELLOW +"EnforcerSuite"+ ChatColor.GOLD +"] "+ ChatColor.YELLOW;
@@ -47,5 +47,4 @@ public class enforcerSuite extends JavaPlugin{
     public void onDisable(){
         
     }
-    
 }
