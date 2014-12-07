@@ -66,7 +66,8 @@ public class DBmanager {
         File save = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + pName + ".obdat");
     }
     public static Destination LoadDest(int sev){
-        String uri = enforcerSuite.getPlugin().getDataFolder() + enforcerSuite.getPlugin().getFileSep() + "DestinationDB" + enforcerSuite.getPlugin().getFileSep() + String.valueOf(sev) + enforcerSuite.getPlugin().getFileSep();
+        String uri = enforcerSuite.getPlugin().getDataFolder() + enforcerSuite.getPlugin().getFileSep() + "Destination-DB" + enforcerSuite.getPlugin().getFileSep() + String.valueOf(sev) + enforcerSuite.getPlugin().getFileSep();
+        
         File f = new File(uri).listFiles()[new Random().nextInt(new File(uri).listFiles().length)];
         Scanner s = new Scanner(f.toString());
         try{
