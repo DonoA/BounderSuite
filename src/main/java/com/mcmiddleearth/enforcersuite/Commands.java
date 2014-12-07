@@ -27,30 +27,30 @@ public class Commands implements CommandExecutor{
             //demote
             if(Bukkit.getServer().getOfflinePlayer(args[0]).isOnline()){
                 Player ob = Bukkit.getPlayer(args[0]);
-                ob.teleport(enforcerSuite.plugin.getMainWorld().getSpawnLocation());
+                ob.teleport(enforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
                 
                 DBmanager.save(ob.getName()); //save OB to file
                 //DBmanager.OBs.put(ob.getName(),OB);
                 
-                p.sendMessage(enforcerSuite.prefix+"You have OB'ed "+ob.getName());
-                ob.sendMessage(enforcerSuite.prefix+"You are an OB now");
+                p.sendMessage(enforcerSuite.getPrefix()+"You have OB'ed "+ob.getName());
+                ob.sendMessage(enforcerSuite.getPrefix()+"You are an OB now");
             }
             //When the OB isn't online...
             /* 
             else if (!Bukkit.getServer().getOfflinePlayer(args[0]).isOnline()) {
-                Bukkit.broadcastMessage(enforcerSuite.prefix+"OB ISN'T ONLINE");   
+                Bukkit.broadcastMessage(enforcerSuite.getPrefix()+"OB ISN'T ONLINE");   
             }
             */
             return true;
         }else if(cmd.getName().equalsIgnoreCase("done")){
             if(!DBmanager.OBs.containsKey(p.getName())){
-                p.sendMessage(enforcerSuite.prefix+"You are not OB!");
+                p.sendMessage(enforcerSuite.getPrefix()+"You are not OB!");
                 return true;
             }else{
                 OathBreaker ob = DBmanager.OBs.get(p.getName());
-                if(ob.isDone(p.getLocation())){
-                    if(ob.getSev()>1){
-                        ob.setFin(new Date());
+                if(ob.isDone()){
+                    if(ob.getSeverity()>1){
+                        ob.setFinished(new Date());
                     }else{
                         DBmanager.archive(p.getName());
                     }

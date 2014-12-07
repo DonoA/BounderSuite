@@ -38,7 +38,7 @@ public class Destination {
     private int Xbound2;
     @Getter @Setter
     private String name;
-    public Destination(int Bounds[], String name, int Sev){
+    public Destination(int Bounds[], String name){
         Zbound1 = Bounds[0];//small
         Zbound2 = Bounds[1];
         Xbound1 = Bounds[2];//small
