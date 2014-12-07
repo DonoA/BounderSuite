@@ -8,10 +8,12 @@ package com.mcmiddleearth.enforcersuite;
 
 import com.mcmiddleearth.enforcersuite.DBmanager.LocationIndex;
 import java.util.Date;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -25,21 +27,53 @@ public class OathBreaker {
     private String rank;
     
     @Getter @Setter
-    private String pName;
+    private int Severity;
     
     @Getter @Setter
-    private int Sev;
+    private Date finished;
     
     @Getter @Setter
-    private Date fin;
+    private Date demotion;
     
-    public OathBreaker(int sev, String pName, String rank){
+    @Getter @Setter
+    private boolean Started = false;
+    
+    @Getter @Setter
+    private boolean rePromoted = false;
+    
+    @Getter @Setter
+    private boolean isDone = false;
+    
+    @Getter @Setter
+    private UUID OB;
+    
+    @Getter @Setter
+    private UUID Enforcer;
+    
+    @Getter @Setter
+    private String notes;
+    
+    
+    
+    
+    public OathBreaker(int sev, String rank, Player enforcer, Player OB){
         this.Destination = LocationIndex.genLoc(sev);
-        this.pName = pName;
         this.rank = rank;
-        this.Sev = sev;
+        this.Severity = sev;
+        this.Enforcer = enforcer.getUniqueId();
+        this.OB = OB.getUniqueId();
     }
-    public boolean isDone(Location loc){
-        return Destination.inDes(Bukkit.getPlayer(pName).getLocation());
+    public boolean inDestination(Location loc){
+        if(Destination.inDes(loc)){
+            isDone = true;
+            return true;//is player in dest
+        }else{
+            return false;
+        }
+    }
+    
+    public boolean Archive(){//wip
+        
+        return false;
     }
 }

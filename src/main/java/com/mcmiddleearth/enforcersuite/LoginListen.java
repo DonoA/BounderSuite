@@ -36,14 +36,15 @@ public class LoginListen implements Listener{
     public void onPlayerJoin(PlayerJoinEvent e){
         Player p = e.getPlayer();
         if(DBmanager.load(p.getName())){//if they are ob
-            if(DBmanager.OBs.get(p.getName()).getSev()==2){
-                if(DBmanager.OBs.get(p.getName()).getFin().before(new Date())){
+            if(DBmanager.OBs.get(p.getName()).getSeverity()==2){
+                if(DBmanager.OBs.get(p.getName()).getFinished().before(new Date())){
                     p.sendMessage(ChatColor.YELLOW + "You are no longer OB");
                     DBmanager.archive(p.getName());
-                }else{
-                    p.sendMessage(ChatColor.YELLOW + "You are OB until: " + ChatColor.RED + DBmanager.OBs.get(p.getName()).getFin().toString());
-                    p.sendMessage(ChatColor.YELLOW + "Your Location is " + ChatColor.RED + DBmanager.OBs.get(p.getName()).getDestination().getName());
                 }
+            }
+            if(!DBmanager.OBs.get(p.getName()).isDone()){
+                p.sendMessage(ChatColor.YELLOW + "You are OB until: " + ChatColor.RED + DBmanager.OBs.get(p.getName()).getFinished().toString());
+                p.sendMessage(ChatColor.YELLOW + "Your Location is " + ChatColor.RED + DBmanager.OBs.get(p.getName()).getDestination().getName());
             }
         }
     }

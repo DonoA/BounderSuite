@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,14 +27,14 @@ import java.util.logging.Logger;
 public class DBmanager {
     public static HashMap<String, OathBreaker> OBs = new HashMap<>();
     
-    private static File DataFile = new File(enforcerSuite.getPlugin().getDataFolder() + System.getProperty("file.separator") + "OBdat");
+    private static File OBFiles = new File(enforcerSuite.getPlugin().getDataFolder() + System.getProperty("file.separator") + "OB-DB");
     
     public static void save(String pName){
-        if(!DataFile.exists()){
-            DataFile.mkdirs();
+        if(!OBFiles.exists()){
+            OBFiles.mkdirs();
         }
-        File saveStart = new File(DataFile + System.getProperty("file.separator") + pName + ".new.obdat");
-        File saveFin = new File(DataFile + System.getProperty("file.separator") + pName + ".obdat");
+        File saveStart = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + pName + ".new.obdat");
+        File saveFin = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + pName + ".obdat");
         if(saveFin.exists()&&saveStart.exists()){
             saveFin.delete();
             saveFin.renameTo(saveFin);
@@ -55,29 +56,26 @@ public class DBmanager {
         }
     }
     public static boolean load(String pName){
-        File save = new File(DataFile + System.getProperty("file.separator") + pName + ".obdat");
+        File save = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + pName + ".obdat");
         if(!save.exists())
             return false;                                   
         
         return true;
     }
     public static void archive(String pName){
-        
+        File save = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + pName + ".obdat");
     }
     public static Destination LoadDest(int sev){
         String uri = enforcerSuite.getPlugin().getDataFolder() + enforcerSuite.getPlugin().getFileSep() + "DestinationDB" + enforcerSuite.getPlugin().getFileSep() + String.valueOf(sev) + enforcerSuite.getPlugin().getFileSep();
-        new File(uri).listFiles()[];//fack
-        Scanner s = new Scanner(uri);
+        File f = new File(uri).listFiles()[new Random().nextInt(new File(uri).listFiles().length)];
+        Scanner s = new Scanner(f.toString());
         try{
             int Bounds[] = new int[] {Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine())};
             String name = s.nextLine();
+            return new Destination(Bounds, name); 
         }catch(NumberFormatException e){
             System.out.println("Bad Destination File");
+            return null;
         }
-        int line = Integer.parseInt(s.nextLine());
-        
-        
-        
-        return null;
     }
 }
