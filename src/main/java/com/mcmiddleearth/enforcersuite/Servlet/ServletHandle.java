@@ -19,6 +19,7 @@
 
 package com.mcmiddleearth.enforcersuite.Servlet;
 
+import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +34,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 public class ServletHandle extends AbstractHandler{
     @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        response.getWriter().println(EnforcerSuite.getPrefix());
         //add this shiz
     }
 }
