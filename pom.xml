@@ -40,11 +40,11 @@
                                     <relocations>
                                         <relocation>
                                             <pattern>org.codehaus</pattern>
-                                            <shadedPattern>co.mcme.thegaffer.libs.org.codehaus</shadedPattern>
+                                            <shadedPattern>com.mcmiddleearth.EnforcerSuite.libs.org.codehaus</shadedPattern>
                                         </relocation>
                                         <relocation>
                                             <pattern>org.eclipse</pattern>
-                                            <shadedPattern>co.mcme.thegaffer.libs.org.eclipse</shadedPattern>
+                                            <shadedPattern>com.mcmiddleearth.EnforcerSuite.libs.org.eclipse</shadedPattern>
                                         </relocation>
                                     </relocations>
                                     <artifactSet>
