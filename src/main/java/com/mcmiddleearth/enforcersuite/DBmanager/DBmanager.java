@@ -8,7 +8,7 @@ package com.mcmiddleearth.enforcersuite.DBmanager;
 
 import com.mcmiddleearth.enforcersuite.Destination;
 import com.mcmiddleearth.enforcersuite.OathBreaker;
-import com.mcmiddleearth.enforcersuite.enforcerSuite;
+import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 public class DBmanager {
     public static HashMap<String, OathBreaker> OBs = new HashMap<>();
     
-    private static File OBFiles = new File(enforcerSuite.getPlugin().getDataFolder() + System.getProperty("file.separator") + "OB-DB");
+    private static File OBFiles = new File(EnforcerSuite.getPlugin().getDataFolder() + System.getProperty("file.separator") + "OB-DB");
     
     public static void save(String pName){
         if(!OBFiles.exists()){
@@ -66,7 +66,7 @@ public class DBmanager {
         File save = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + pName + ".obdat");
     }
     public static Destination LoadDest(int sev){
-        String uri = enforcerSuite.getPlugin().getDataFolder() + enforcerSuite.getPlugin().getFileSep() + "Destination-DB" + enforcerSuite.getPlugin().getFileSep() + String.valueOf(sev) + enforcerSuite.getPlugin().getFileSep();
+        String uri = EnforcerSuite.getPlugin().getDataFolder() + EnforcerSuite.getPlugin().getFileSep() + "Destination-DB" + EnforcerSuite.getPlugin().getFileSep() + String.valueOf(sev) + EnforcerSuite.getPlugin().getFileSep();
         
         File f = new File(uri).listFiles()[new Random().nextInt(new File(uri).listFiles().length)];
         Scanner s = new Scanner(f.toString());

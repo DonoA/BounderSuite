@@ -14,7 +14,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 /**
  *
  * @author Donovan
@@ -24,16 +24,21 @@ public class Commands implements CommandExecutor{
     public boolean onCommand(CommandSender sender, Command cmd,String Label, String[] args){
         Player p = (Player) sender;
         if(p.hasPermission("enforcerHelper.ob")&&args.length>1&&cmd.getName().equalsIgnoreCase("ob")){
+            try{ // check that args[1] is and int
+                Integer.parseInt(args[1]);
+            }catch (NumberFormatException e){
+                return false;
+            }
             //demote
             if(Bukkit.getServer().getOfflinePlayer(args[0]).isOnline()){
                 Player ob = Bukkit.getPlayer(args[0]);
-                ob.teleport(enforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
+                ob.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
                 
+                DBmanager.OBs.put(ob.getName(), new OathBreaker(Integer.parseInt(args[1]), PermissionsEx.getUser(ob).getPrefix(), p, ob));
                 DBmanager.save(ob.getName()); //save OB to file
-                //DBmanager.OBs.put(ob.getName(),OB);
                 
-                p.sendMessage(enforcerSuite.getPrefix()+"You have OB'ed "+ob.getName());
-                ob.sendMessage(enforcerSuite.getPrefix()+"You are an OB now");
+                p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+ob.getName());
+                ob.sendMessage(EnforcerSuite.getPrefix()+"You are an OathBreaker now");
             }
             //When the OB isn't online...
             /* 
@@ -44,7 +49,7 @@ public class Commands implements CommandExecutor{
             return true;
         }else if(cmd.getName().equalsIgnoreCase("done")){
             if(!DBmanager.OBs.containsKey(p.getName())){
-                p.sendMessage(enforcerSuite.getPrefix()+"You are not OB!");
+                p.sendMessage(EnforcerSuite.getPrefix()+"You are not OB!");
                 return true;
             }else{
                 OathBreaker ob = DBmanager.OBs.get(p.getName());

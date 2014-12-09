@@ -1,7 +1,10 @@
-name: EnforcerSuite
-main: com.mcmiddleearth.enforcersuite.enforcerSuite
-version: 0.1
+name: ${project.artifactId}
+main: com.mcmiddleearth.enforcersuite.EnforcerSuite
+version: ${project.version}
+website: ${project.url}
 description: makes OBing a player easier
+author: DonoA
+authors: [DonoA, aaldim]
 commands:
   ob:
     description: OathBreaker a player

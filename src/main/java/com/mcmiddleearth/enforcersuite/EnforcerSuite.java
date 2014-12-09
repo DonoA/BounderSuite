@@ -8,20 +8,23 @@ package com.mcmiddleearth.enforcersuite;
 
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import com.mcmiddleearth.enforcersuite.DBmanager.LocationIndex;
+import com.mcmiddleearth.enforcersuite.Servlet.Servlet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 //Oathbreaker, Thrall, Commoner, Ranger, Artist, Foreman, Artisan, Steward, Enforcer, Valar
 /**
  *
  * @author Donovan, aaldim
  */
-public class enforcerSuite extends JavaPlugin{
+public class EnforcerSuite extends JavaPlugin{
     @Getter
-    private static enforcerSuite plugin;
+    private static EnforcerSuite plugin;
     
     @Getter
     private static String prefix = ChatColor.GOLD +"["+ ChatColor.YELLOW +"EnforcerSuite"+ ChatColor.GOLD +"] "+ ChatColor.YELLOW;
@@ -31,21 +34,29 @@ public class enforcerSuite extends JavaPlugin{
     
     @Getter @Setter
     private World MainWorld;
+    
+    @Getter
+    private Servlet servlet;
             
     @Override
     public void onEnable(){
         this.saveDefaultConfig();
         this.reloadConfig();
+        int port = this.getConfig().getInt("port");
         plugin = this;
         getCommand("ob").setExecutor(new Commands());
         getCommand("done").setExecutor(new Commands());
         LocationIndex.loadLocs();
         MainWorld = Bukkit.getWorld(this.getConfig().getString("MainWorld"));
-
+        servlet = new Servlet(port);
+        servlet.start();
     }
     @Override
     public void onDisable(){
-        
+        try {
+            servlet.getServer().stop();
+        } catch (Exception ex) {
+            Logger.getLogger(EnforcerSuite.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
 }
