@@ -11,13 +11,11 @@ import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import com.mcmiddleearth.enforcersuite.Infraction;
 import com.mcmiddleearth.enforcersuite.Record;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Date;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.Scanner;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,6 +35,12 @@ public class DBmanager {
     static{
         if(!OBFiles.exists()){
             OBFiles.mkdirs();
+        }
+        if(!(new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator")).exists())){
+            new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator")).mkdirs();
+        }
+        if(!(new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator")).exists())){
+            new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator")).mkdirs();
         }
     }
     
@@ -98,17 +102,23 @@ public class DBmanager {
     public static Destination LoadDest(int sev){
         String uri = EnforcerSuite.getPlugin().getDataFolder() + EnforcerSuite.getPlugin().getFileSep() + "Destination-DB" + EnforcerSuite.getPlugin().getFileSep() + String.valueOf(sev) + EnforcerSuite.getPlugin().getFileSep();
         File f = new File(uri).listFiles()[new Random().nextInt(new File(uri).listFiles().length)];
-        Scanner s = new Scanner(f.toString());
+//        Scanner s = new Scanner(f.toString());
         try{
-            Bukkit.getLogger().info(f.toString());
-            Bukkit.broadcastMessage(f.toString());
-            String Bounds[] = new String[] {(s.nextLine()), (s.nextLine()), (s.nextLine()), (s.nextLine())};
-//            int Bounds[] = new int[] {Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine())};
-            Bukkit.getLogger().severe(Bounds.toString());
-            String name = s.nextLine();
-            return null;//new Destination(Bounds, name); 
+            RandomAccessFile s = new RandomAccessFile(f, "r");
+//            Bukkit.broadcastMessage(String.valueOf(s.length()));
+//            String Bounds[] = new String[] {s.readLine(), s.readLine(), s.readLine(), s.readLine()};
+            int Bounds[] = new int[] {Integer.parseInt(s.readLine()), Integer.parseInt(s.readLine()), Integer.parseInt(s.readLine()), Integer.parseInt(s.readLine())};
+            Bukkit.broadcastMessage(Bounds.toString());
+            String name = s.readLine();
+            return new Destination(Bounds, name); 
         }catch(NumberFormatException e){
             System.out.println("Bad Destination File " + e.toString());
+            return null;
+        } catch (FileNotFoundException ex) {
+            System.out.println("Bad Destination File " + ex.toString());
+            return null;
+        } catch (IOException ex) {
+            System.out.println("Bad Destination File " + ex.toString());
             return null;
         }
     }
