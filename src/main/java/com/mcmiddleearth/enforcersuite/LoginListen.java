@@ -35,16 +35,20 @@ public class LoginListen implements Listener{
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         Player p = e.getPlayer();
-        if(DBmanager.load(p.getName())){//if they are ob
-            if(DBmanager.OBs.get(p.getName()).getSeverity()==2){
-                if(DBmanager.OBs.get(p.getName()).getFinished().before(new Date())){
+        if(DBmanager.load(p.getUniqueId().toString())){//if they are ob
+            if(!DBmanager.OBs.get(p.getUniqueId().toString()).isStarted()){
+                p.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
+                DBmanager.OBs.get(p.getUniqueId().toString()).setStarted(true);
+            }
+            if(DBmanager.OBs.get(p.getUniqueId().toString()).getSeverity()==2){
+                if(DBmanager.OBs.get(p.getUniqueId().toString()).getFinished().before(new Date())){
                     p.sendMessage(ChatColor.YELLOW + "You are no longer OB");
-                    DBmanager.archive(p.getName());
+                    DBmanager.archive(p.getUniqueId().toString());
                 }
             }
-            if(!DBmanager.OBs.get(p.getName()).isDone()){
-                p.sendMessage(ChatColor.YELLOW + "You are OB until: " + ChatColor.RED + DBmanager.OBs.get(p.getName()).getFinished().toString());
-                p.sendMessage(ChatColor.YELLOW + "Your Location is " + ChatColor.RED + DBmanager.OBs.get(p.getName()).getDestination().getName());
+            if(!DBmanager.OBs.get(p.getUniqueId().toString()).isDone()){
+                p.sendMessage(ChatColor.YELLOW + "You are OB until: " + ChatColor.RED + DBmanager.OBs.get(p.getUniqueId().toString()).getFinished().toString());
+                p.sendMessage(ChatColor.YELLOW + "Your Location is " + ChatColor.RED + DBmanager.OBs.get(p.getUniqueId().toString()).getDestination().getName());
             }
         }
     }

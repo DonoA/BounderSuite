@@ -7,7 +7,6 @@
 package com.mcmiddleearth.enforcersuite;
 
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
-import com.mcmiddleearth.enforcersuite.DBmanager.LocationIndex;
 import com.mcmiddleearth.enforcersuite.Servlet.Servlet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.codehaus.jackson.map.ObjectMapper;
 //Oathbreaker, Thrall, Commoner, Ranger, Artist, Foreman, Artisan, Steward, Enforcer, Valar
 /**
  *
@@ -37,16 +37,19 @@ public class EnforcerSuite extends JavaPlugin{
     
     @Getter
     private Servlet servlet;
+    
+    @Getter
+    private static ObjectMapper JSonParser;
             
     @Override
     public void onEnable(){
         this.saveDefaultConfig();
         this.reloadConfig();
         int port = this.getConfig().getInt("port");
+        JSonParser = new ObjectMapper();
         plugin = this;
         getCommand("ob").setExecutor(new Commands());
         getCommand("done").setExecutor(new Commands());
-        LocationIndex.loadLocs();
         MainWorld = Bukkit.getWorld(this.getConfig().getString("MainWorld"));
         servlet = new Servlet(port);
         servlet.start();

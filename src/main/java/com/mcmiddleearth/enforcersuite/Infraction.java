@@ -6,7 +6,7 @@
 
 package com.mcmiddleearth.enforcersuite;
 
-import com.mcmiddleearth.enforcersuite.DBmanager.LocationIndex;
+import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import java.util.Date;
 import java.util.UUID;
 import lombok.Getter;
@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
  *
  * @author Donovan
  */
-public class OathBreaker {
+public class Infraction {
     @Getter @Setter
     private Destination Destination;
     
@@ -45,23 +45,18 @@ public class OathBreaker {
     private boolean isDone = false;
     
     @Getter @Setter
-    private UUID OB;
-    
-    @Getter @Setter
     private UUID Enforcer;
     
     @Getter @Setter
     private String notes;
     
-    
-    
-    
-    public OathBreaker(int sev, String rank, Player enforcer, Player OB){
-        this.Destination = LocationIndex.genLoc(sev);
+    public Infraction(int sev, String rank, Player enforcer, Player OB){
+        this.Destination = DBmanager.LoadDest(sev);
         this.rank = rank;
         this.Severity = sev;
         this.Enforcer = enforcer.getUniqueId();
-        this.OB = OB.getUniqueId();
+        this.demotion = new Date();
+//        this.OB = OB.getUniqueId();
     }
     public boolean inDestination(Location loc){
         if(Destination.inDes(loc)){
@@ -70,10 +65,5 @@ public class OathBreaker {
         }else{
             return false;
         }
-    }
-    
-    public boolean Archive(){//wip
-        
-        return false;
     }
 }
