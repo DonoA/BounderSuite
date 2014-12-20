@@ -46,6 +46,10 @@
                                             <pattern>org.eclipse</pattern>
                                             <shadedPattern>com.mcmiddleearth.EnforcerSuite.libs.org.eclipse</shadedPattern>
                                         </relocation>
+                                        <relocation>
+                                            <pattern>ru.tehkode</pattern>
+                                            <shadedPattern>com.mcmiddleearth.EnforcerSuite.libs.ru.tehkode</shadedPattern>
+                                        </relocation>
                                     </relocations>
                                     <artifactSet>
                                         <excludes>

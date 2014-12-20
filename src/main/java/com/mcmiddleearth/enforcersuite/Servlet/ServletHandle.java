@@ -20,13 +20,15 @@
 package com.mcmiddleearth.enforcersuite.Servlet;
 
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Scanner;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-
 /**
  *
  * @author Donovan
@@ -34,7 +36,20 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 public class ServletHandle extends AbstractHandler{
     @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.getWriter().println(EnforcerSuite.getPrefix());
-        //add this shiz
+        String[] args = target.split("/");
+        response.setHeader("Server", EnforcerSuite.getPrefix());
+        if(args.length>=2){
+            if(args[1].equalsIgnoreCase("current")){
+                baseRequest.setHandled(true);
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().print(ServletDBmanager.getOBs(true));
+            }else if(args[1].equalsIgnoreCase("archive")){
+                baseRequest.setHandled(true);
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().print(ServletDBmanager.getOBs(false));
+            }else if(args[1].equalsIgnoreCase("records") && args.length>=3){
+                
+            }
+        }
     }
 }
