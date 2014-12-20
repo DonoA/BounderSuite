@@ -67,11 +67,12 @@ public class DBmanager {
     }
     public static boolean load(UUID uuid){
         File save = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
+        System.out.println(save.toString());
         if(!save.exists())
             return false;
-        
+        System.out.println("OB dat found");
         try {
-            EnforcerSuite.getJSonParser().readValue(save, Infraction.class);
+            DBmanager.OBs.put(uuid, EnforcerSuite.getJSonParser().readValue(save, Infraction.class));
         } catch (IOException ex) {
             Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
         }

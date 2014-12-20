@@ -58,6 +58,9 @@ public class Infraction {
         this.demotion = new Date();
 //        this.OB = OB.getUniqueId();
     }
+    
+    public Infraction(){}
+    
     public boolean inDestination(Location loc){
         if(Destination.inDes(loc)){
             isDone = true;

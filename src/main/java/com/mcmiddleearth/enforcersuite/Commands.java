@@ -33,8 +33,9 @@ public class Commands implements CommandExecutor{
             if(Bukkit.getServer().getOfflinePlayer(args[0]).isOnline()){
                 Player ob = Bukkit.getPlayer(args[0]);
                 ob.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
-                
-                DBmanager.OBs.put(ob.getUniqueId(), new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, ob));
+                Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, ob);
+                inf.setStarted(true);
+                DBmanager.OBs.put(ob.getUniqueId(), inf);
                 for(int j=0; j <= 3; j++){
                     Bukkit.dispatchCommand(sender, "demote " + args[0]);
                 }
@@ -56,10 +57,13 @@ public class Commands implements CommandExecutor{
                 return true;
             }else{
                 Infraction ob = DBmanager.OBs.get(p.getUniqueId());
-                if(ob.isDone()){
+                if(ob.inDestination(p.getLocation())){
                     if(ob.getSeverity()>1){
                         ob.setFinished(new Date());
+                        p.sendMessage(EnforcerSuite.getPrefix() + "You are OB until for one more week");
                     }else{
+                        p.sendMessage(EnforcerSuite.getPrefix() + "You are no longer OB!");
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "promote " + p.getName());
                         DBmanager.archive(p.getUniqueId());
                     }
                 }else{
