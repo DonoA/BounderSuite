@@ -44,7 +44,7 @@ public class Record {
     public Record(){}
     
     public boolean Archive(){//wip
-        DBmanager.archive(OB.toString());
+        DBmanager.archive(OB);
         return false;
     }
 }

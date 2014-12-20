@@ -35,20 +35,20 @@ public class LoginListen implements Listener{
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         Player p = e.getPlayer();
-        if(DBmanager.load(p.getUniqueId().toString())){//if they are ob
-            if(!DBmanager.OBs.get(p.getUniqueId().toString()).isStarted()){
+        if(DBmanager.load(p.getUniqueId())){//if they are ob
+            if(!DBmanager.OBs.get(p.getUniqueId()).isStarted()){
                 p.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
-                DBmanager.OBs.get(p.getUniqueId().toString()).setStarted(true);
+                DBmanager.OBs.get(p.getUniqueId()).setStarted(true);
             }
-            if(DBmanager.OBs.get(p.getUniqueId().toString()).getSeverity()==2){
-                if(DBmanager.OBs.get(p.getUniqueId().toString()).getFinished().before(new Date())){
+            if(DBmanager.OBs.get(p.getUniqueId()).getSeverity()==2){
+                if(DBmanager.OBs.get(p.getUniqueId()).getFinished().before(new Date())){
                     p.sendMessage(ChatColor.YELLOW + "You are no longer OB");
-                    DBmanager.archive(p.getUniqueId().toString());
+                    DBmanager.archive(p.getUniqueId());
                 }
             }
-            if(!DBmanager.OBs.get(p.getUniqueId().toString()).isDone()){
-                p.sendMessage(ChatColor.YELLOW + "You are OB until: " + ChatColor.RED + DBmanager.OBs.get(p.getUniqueId().toString()).getFinished().toString());
-                p.sendMessage(ChatColor.YELLOW + "Your Location is " + ChatColor.RED + DBmanager.OBs.get(p.getUniqueId().toString()).getDestination().getName());
+            if(!DBmanager.OBs.get(p.getUniqueId()).isDone()){
+                p.sendMessage(ChatColor.YELLOW + "You are OB until: " + ChatColor.RED + DBmanager.OBs.get(p.getUniqueId()).getFinished().toString());
+                p.sendMessage(ChatColor.YELLOW + "Your Location is " + ChatColor.RED + DBmanager.OBs.get(p.getUniqueId()).getDestination().getName());
             }
         }
     }

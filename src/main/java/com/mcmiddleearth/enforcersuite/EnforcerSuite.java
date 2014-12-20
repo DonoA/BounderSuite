@@ -17,6 +17,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.codehaus.jackson.map.ObjectMapper;
+import ru.tehkode.permissions.PermissionManager;
 //Oathbreaker, Thrall, Commoner, Ranger, Artist, Foreman, Artisan, Steward, Enforcer, Valar
 /**
  *
@@ -43,6 +44,7 @@ public class EnforcerSuite extends JavaPlugin{
             
     @Override
     public void onEnable(){
+//        Bukkit.getServer().getPluginManager().enablePlugin();
         this.saveDefaultConfig();
         this.reloadConfig();
         int port = this.getConfig().getInt("port");
@@ -53,6 +55,7 @@ public class EnforcerSuite extends JavaPlugin{
         MainWorld = Bukkit.getWorld(this.getConfig().getString("MainWorld"));
         servlet = new Servlet(port);
         servlet.start();
+        
     }
     @Override
     public void onDisable(){

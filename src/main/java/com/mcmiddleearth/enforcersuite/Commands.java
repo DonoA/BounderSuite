@@ -34,13 +34,13 @@ public class Commands implements CommandExecutor{
                 Player ob = Bukkit.getPlayer(args[0]);
                 ob.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
                 
-                DBmanager.OBs.put(ob.getName(), new Infraction(Integer.parseInt(args[1]), PermissionsEx.getUser(ob).getPrefix(), p, ob));
+                DBmanager.OBs.put(ob.getUniqueId(), new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, ob));
                 for(int j=0; j <= 3; j++){
                     Bukkit.dispatchCommand(sender, "demote " + args[0]);
                 }
-                DBmanager.save(ob.getName()); //save OB to file
+                DBmanager.save(ob.getUniqueId()); //save OB to file
                 
-                p.sendMessage(EnforcerSuite.getPrefix()+"You have been OathBreakered "+ob.getName());
+                p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+ob.getName());
                 ob.sendMessage(EnforcerSuite.getPrefix()+"You are an OathBreaker now");
             }
             //When the OB isn't online...
@@ -51,16 +51,16 @@ public class Commands implements CommandExecutor{
             */
             return true;
         }else if(cmd.getName().equalsIgnoreCase("done")){
-            if(!DBmanager.OBs.containsKey(p.getName())){
+            if(!DBmanager.OBs.containsKey(p.getUniqueId())){
                 p.sendMessage(EnforcerSuite.getPrefix()+"You are not OB!");
                 return true;
             }else{
-                Infraction ob = DBmanager.OBs.get(p.getName());
+                Infraction ob = DBmanager.OBs.get(p.getUniqueId());
                 if(ob.isDone()){
                     if(ob.getSeverity()>1){
                         ob.setFinished(new Date());
                     }else{
-                        DBmanager.archive(p.getName());
+                        DBmanager.archive(p.getUniqueId());
                     }
                 }else{
                     p.sendMessage("You have not reached your location");

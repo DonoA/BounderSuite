@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
@@ -27,18 +28,21 @@ import org.bukkit.Bukkit;
  * @author Donovan
  */
 public class DBmanager {
-    public static HashMap<String, Infraction> OBs = new HashMap<>();
+    public static HashMap<UUID, Infraction> OBs = new HashMap<>();
     
-    public static HashMap<String, Record> Records = new HashMap<>();
+    public static HashMap<UUID, Record> Records = new HashMap<>();
     
-    private static File OBFiles = new File(EnforcerSuite.getPlugin().getDataFolder() + System.getProperty("file.separator") + "OB-DB");
+    private final static File OBFiles = new File(EnforcerSuite.getPlugin().getDataFolder() + System.getProperty("file.separator") + "OB-DB");
     
-    public static void save(String uuid){
+    static{
         if(!OBFiles.exists()){
             OBFiles.mkdirs();
         }
-        File saveStart = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + uuid + ".new.obdat");
-        File saveFin = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + uuid + ".obdat");
+    }
+    
+    public static void save(UUID uuid){
+        File saveStart = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + uuid.toString() + ".new.obdat");
+        File saveFin = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
         if(saveFin.exists()&&saveStart.exists()){
             saveFin.delete();
             saveFin.renameTo(saveFin);
@@ -57,11 +61,8 @@ public class DBmanager {
              }
          }
     }
-    public static boolean load(String uuid){
-        if(!OBFiles.exists()){
-            OBFiles.mkdirs();
-        }
-        File save = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + uuid + ".obdat");
+    public static boolean load(UUID uuid){
+        File save = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
         if(!save.exists())
             return false;
         
@@ -72,12 +73,9 @@ public class DBmanager {
         }
         return true;
     }
-    public static void archive(String uuid){
-        if(!OBFiles.exists()){
-            OBFiles.mkdirs();
-        }
-        File saveStart = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + uuid + ".new.obdat");
-        File saveFin = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + uuid + ".obdat");
+    public static void archive(UUID uuid){
+        File saveStart = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + uuid.toString() + ".new.obdat");
+        File saveFin = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
         if(saveFin.exists()&&saveStart.exists()){
             saveFin.delete();
             saveFin.renameTo(saveFin);
@@ -98,16 +96,17 @@ public class DBmanager {
         
     }
     public static Destination LoadDest(int sev){
-        if(!OBFiles.exists()){
-            OBFiles.mkdirs();
-        }
         String uri = EnforcerSuite.getPlugin().getDataFolder() + EnforcerSuite.getPlugin().getFileSep() + "Destination-DB" + EnforcerSuite.getPlugin().getFileSep() + String.valueOf(sev) + EnforcerSuite.getPlugin().getFileSep();
         File f = new File(uri).listFiles()[new Random().nextInt(new File(uri).listFiles().length)];
         Scanner s = new Scanner(f.toString());
         try{
-            int Bounds[] = new int[] {Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine())};
+            Bukkit.getLogger().info(f.toString());
+            Bukkit.broadcastMessage(f.toString());
+            String Bounds[] = new String[] {(s.nextLine()), (s.nextLine()), (s.nextLine()), (s.nextLine())};
+//            int Bounds[] = new int[] {Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine())};
+            Bukkit.getLogger().severe(Bounds.toString());
             String name = s.nextLine();
-            return new Destination(Bounds, name); 
+            return null;//new Destination(Bounds, name); 
         }catch(NumberFormatException e){
             System.out.println("Bad Destination File " + e.toString());
             return null;
