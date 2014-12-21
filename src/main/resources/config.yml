@@ -1,2 +1,2 @@
-port: 8069
+port: 1337
 MainWorld: "world"

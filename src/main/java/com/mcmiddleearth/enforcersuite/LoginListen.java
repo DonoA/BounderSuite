@@ -21,11 +21,13 @@ package com.mcmiddleearth.enforcersuite;
 
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import java.util.Date;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  *
@@ -36,23 +38,32 @@ public class LoginListen implements Listener{
     public void onPlayerJoin(PlayerJoinEvent e){
         Player p = e.getPlayer();
         if(DBmanager.load(p.getUniqueId())){//if they are ob
-            p.sendMessage("enter");
             Infraction curr = DBmanager.OBs.get(p.getUniqueId());
+            curr.setOBname(p.getName());
             if(!curr.isStarted()){
                 p.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
                 curr.setStarted(true);
             }
             if(curr.getSeverity()==2 && curr.isDone()){
-                if(curr.getFinished().before(new Date())){
+                if(curr.getFinished().before(new Date(System.currentTimeMillis() - (86400 * 7 * 1000)))){//if finished is before today minus one week...
                     p.sendMessage(ChatColor.YELLOW + "You are no longer OB");
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "promote " + p.getName());
                     DBmanager.archive(p.getUniqueId());
                 }else{
-                    p.sendMessage(ChatColor.YELLOW + "You are OB until: " + ChatColor.RED + curr.getFinished().toString());
+                    p.sendMessage(ChatColor.YELLOW + "You are OB until: " + ChatColor.RED + new Date(curr.getFinished().getTime() + (86400 * 7 * 1000)).toString());
                 }
             }
             if(!curr.isDone()){
                 p.sendMessage(ChatColor.YELLOW + "Your Location is " + ChatColor.RED + curr.getDestination().getName());
             }
+        }
+    }
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player p = event.getPlayer();
+        if(DBmanager.OBs.containsKey(p.getUniqueId())){
+            DBmanager.save(p.getUniqueId());
+            DBmanager.OBs.remove(p.getUniqueId());
         }
     }
 }
