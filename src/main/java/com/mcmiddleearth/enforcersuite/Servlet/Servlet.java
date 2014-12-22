@@ -43,7 +43,8 @@ public class Servlet {
         try{
             if(server != null){
                 server.start();
-                server.join();
+                (new ServletHandle.HelloThread()).start();
+//                server.join();
             }
         } catch (Exception e) {
             System.err.printf("Failed to start servlet on port: " + BoundPort + " : " + e.getMessage());

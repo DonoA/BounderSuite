@@ -15,6 +15,7 @@ import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  *
@@ -63,6 +64,9 @@ public class Infraction {
     @Getter @Setter
     private String OBname;
     
+    @Getter @Setter @JsonIgnore
+    private UUID OBuuid;
+    
     public Infraction(int sev, String rank, Player enforcer, UUID OB){
         this.Destination = DBmanager.LoadDest(sev);
         this.rank = rank;
@@ -70,7 +74,17 @@ public class Infraction {
         this.Enforcer = enforcer.getUniqueId();
         this.demotion = new Date();
 //        this.OBname = OB.getName();
-//        this.OB = OB.getUniqueId();
+        this.OBuuid = OB;
+    }
+    
+    public Infraction(int sev, String rank, Player enforcer, UUID OB, String OBname){
+        this.Destination = DBmanager.LoadDest(sev);
+        this.rank = rank;
+        this.Severity = sev;
+        this.Enforcer = enforcer.getUniqueId();
+        this.demotion = new Date();
+        this.OBname = OBname;
+        this.OBuuid = OB;
     }
     
     public Infraction(){}

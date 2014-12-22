@@ -9,6 +9,8 @@ package com.mcmiddleearth.enforcersuite;
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import com.mcmiddleearth.enforcersuite.Servlet.RequestKey;
 import com.mcmiddleearth.enforcersuite.Servlet.ServletDBmanager;
+import com.mcmiddleearth.enforcersuite.Servlet.ServletHandle;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -38,15 +40,15 @@ public class Commands implements CommandExecutor{
                 return false;
             }
             //demote
-            if(Bukkit.getServer().getOfflinePlayer(args[0]).isOnline()){
+            if(Bukkit.getOfflinePlayer(args[0]).isOnline()){
                 Player ob = Bukkit.getPlayer(args[0]);
                 if(!DBmanager.OBs.containsKey(ob.getUniqueId())){
                     ob.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
-                    Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, ob.getUniqueId());
+                    Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, ob.getUniqueId(), ob.getName());
                     inf.setStarted(true);
                     DBmanager.OBs.put(ob.getUniqueId(), inf);
                     for(int j=0; j <= 3; j++){
-                        Bukkit.dispatchCommand(sender, "demote " + args[0]);
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + args[0]);
                     }
                     DBmanager.save(ob.getUniqueId()); //save OB to file
 
@@ -57,9 +59,11 @@ public class Commands implements CommandExecutor{
                         String ip = p.getAddress().toString().replace("/", "");
                         ip = ip.substring(0, ip.indexOf(":"));
                         RequestKey key = new RequestKey(String.valueOf(new Date().getTime()), inf, ip);
-                        p.sendMessage(EnforcerSuite.getPrefix()+"Connect to " + addr.getHostName() + ":" + EnforcerSuite.getPlugin().getServlet().getBoundPort() + "/form/" + key.getKey() + " to finish this OB");
+                        p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + ob.getUniqueId().toString());
                         ServletDBmanager.Keys.put(ip, key);
                     } catch (UnknownHostException ex) {
+                        Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
                         Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     ob.sendMessage(EnforcerSuite.getPrefix()+"You are an OathBreaker now");
@@ -71,7 +75,7 @@ public class Commands implements CommandExecutor{
                 OfflinePlayer ob = Bukkit.getOfflinePlayer(args[0]);
                 Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, ob.getUniqueId());
                 for(int j=0; j <= 3; j++){
-                        Bukkit.dispatchCommand(sender, "demote " + args[0]);
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + args[0]);
                 }
                 DBmanager.save(ob.getUniqueId());
                 p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+ob.getName());
@@ -81,9 +85,11 @@ public class Commands implements CommandExecutor{
                     String ip = p.getAddress().toString().replace("/", "");
                     ip = ip.substring(0, ip.indexOf(":"));
                     RequestKey key = new RequestKey(String.valueOf(new Date().getTime()), inf, ip);
-                    p.sendMessage(EnforcerSuite.getPrefix()+"Connect to " + addr.getHostName() + ":" + EnforcerSuite.getPlugin().getServlet().getBoundPort() + "/form/" + key.getKey() + " to finish this OB");
+                    p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + ob.getUniqueId().toString());
                     ServletDBmanager.Keys.put(ip, key);
                 } catch (UnknownHostException ex) {
+                    Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
                     Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
                 }
         }
