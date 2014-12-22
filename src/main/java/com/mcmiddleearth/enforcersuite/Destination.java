@@ -49,7 +49,7 @@ public class Destination {
         
     }
     public boolean inDes(Location loc){
-        return ((loc.getX()>this.Xbound1&&loc.getX()<this.Xbound2)&&(loc.getY()>this.Xbound1&&loc.getY()<this.Xbound2));
+        return ((loc.getX()>this.Xbound1&&loc.getX()<this.Xbound2)&&(loc.getZ()>this.Zbound1&&loc.getZ()<this.Zbound2));
     }
     
 }

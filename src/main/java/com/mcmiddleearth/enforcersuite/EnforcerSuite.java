@@ -15,6 +15,7 @@ import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.codehaus.jackson.map.ObjectMapper;
 import ru.tehkode.permissions.PermissionManager;
@@ -44,18 +45,18 @@ public class EnforcerSuite extends JavaPlugin{
             
     @Override
     public void onEnable(){
-//        Bukkit.getServer().getPluginManager().enablePlugin();
         this.saveDefaultConfig();
         this.reloadConfig();
         int port = this.getConfig().getInt("port");
         JSonParser = new ObjectMapper();
         plugin = this;
+        PluginManager pm = this.getServer().getPluginManager();
+        pm.registerEvents(new LoginListen(), this);
         getCommand("ob").setExecutor(new Commands());
         getCommand("done").setExecutor(new Commands());
         MainWorld = Bukkit.getWorld(this.getConfig().getString("MainWorld"));
         servlet = new Servlet(port);
         servlet.start();
-        
     }
     @Override
     public void onDisable(){

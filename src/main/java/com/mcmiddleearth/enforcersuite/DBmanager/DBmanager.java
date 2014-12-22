@@ -28,7 +28,7 @@ import org.bukkit.Bukkit;
 public class DBmanager {
     public static HashMap<UUID, Infraction> OBs = new HashMap<>();
     
-    public static HashMap<UUID, Record> Records = new HashMap<>();
+//    public static HashMap<UUID, Record> Records = new HashMap<>();
     
     private final static File OBFiles = new File(EnforcerSuite.getPlugin().getDataFolder() + System.getProperty("file.separator") + "OB-DB");
     
@@ -69,15 +69,33 @@ public class DBmanager {
         File save = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
         if(!save.exists())
             return false;
-        
         try {
-            EnforcerSuite.getJSonParser().readValue(save, Infraction.class);
+            DBmanager.OBs.put(uuid, EnforcerSuite.getJSonParser().readValue(save, Infraction.class));
         } catch (IOException ex) {
             Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
         }
         return true;
     }
+    
+    
     public static void archive(UUID uuid){
+        File save = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
+        Record r = null;
+        if(save.exists()){
+            try {
+                r = EnforcerSuite.getJSonParser().readValue(save, Record.class);
+            } catch (IOException ex) {
+                Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+                return;
+            }
+        }else{
+            r = new Record();
+            r.setOB(uuid);
+        }
+        r.getInfractions().add(DBmanager.OBs.get(uuid));
+        DBmanager.OBs.remove(uuid);
+        File OldInf = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
+        OldInf.delete();
         File saveStart = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + uuid.toString() + ".new.obdat");
         File saveFin = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
         if(saveFin.exists()&&saveStart.exists()){
@@ -86,7 +104,7 @@ public class DBmanager {
         }
         boolean successful = true;
         try {
-            EnforcerSuite.getJSonParser().writeValue(saveStart, DBmanager.Records.get(uuid));
+            EnforcerSuite.getJSonParser().writeValue(saveStart, r);
          } catch (IOException ex) {
              successful = false;
          } finally {

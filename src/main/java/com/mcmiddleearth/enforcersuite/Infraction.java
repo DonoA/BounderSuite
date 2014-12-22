@@ -7,6 +7,7 @@
 package com.mcmiddleearth.enforcersuite;
 
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  *
@@ -48,16 +50,45 @@ public class Infraction {
     private UUID Enforcer;
     
     @Getter @Setter
+    private ArrayList<String> BannedOn = new ArrayList<>();
+    
+    @Getter @Setter
+    private ArrayList<String> Reasons = new ArrayList<>();
+    
+    @Getter @Setter
+    private ArrayList<Object> Evidence = new ArrayList<>();
+    
+    @Getter @Setter
     private String notes;
     
-    public Infraction(int sev, String rank, Player enforcer, Player OB){
+    @Getter @Setter
+    private String OBname;
+    
+    @Getter @Setter @JsonIgnore
+    private UUID OBuuid;
+    
+    public Infraction(int sev, String rank, Player enforcer, UUID OB){
         this.Destination = DBmanager.LoadDest(sev);
         this.rank = rank;
         this.Severity = sev;
         this.Enforcer = enforcer.getUniqueId();
         this.demotion = new Date();
-//        this.OB = OB.getUniqueId();
+//        this.OBname = OB.getName();
+        this.OBuuid = OB;
     }
+    
+    public Infraction(int sev, String rank, Player enforcer, UUID OB, String OBname){
+        this.Destination = DBmanager.LoadDest(sev);
+        this.rank = rank;
+        this.Severity = sev;
+        this.Enforcer = enforcer.getUniqueId();
+        this.demotion = new Date();
+        this.OBname = OBname;
+        this.OBuuid = OB;
+    }
+    
+    public Infraction(){}
+    
     public boolean inDestination(Location loc){
         if(Destination.inDes(loc)){
             isDone = true;
