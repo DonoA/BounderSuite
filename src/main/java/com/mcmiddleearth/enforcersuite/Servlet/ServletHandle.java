@@ -134,7 +134,10 @@ public class ServletHandle extends AbstractHandler{
                                     outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rk.getInf()));
                                 }
                             }
+                        }else if(clientSentence.contains("return")){
+                            System.out.println(clientSentence);
                         }
+                            
                     } catch (IOException ex) {
                         Logger.getLogger(ServletHandle.class.getName()).log(Level.SEVERE, null, ex);
                     }
