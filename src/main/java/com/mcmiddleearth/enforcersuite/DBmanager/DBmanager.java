@@ -120,13 +120,9 @@ public class DBmanager {
     public static Destination LoadDest(int sev){
         String uri = EnforcerSuite.getPlugin().getDataFolder() + EnforcerSuite.getPlugin().getFileSep() + "Destination-DB" + EnforcerSuite.getPlugin().getFileSep() + String.valueOf(sev) + EnforcerSuite.getPlugin().getFileSep();
         File f = new File(uri).listFiles()[new Random().nextInt(new File(uri).listFiles().length)];
-//        Scanner s = new Scanner(f.toString());
         try{
             RandomAccessFile s = new RandomAccessFile(f, "r");
-//            Bukkit.broadcastMessage(String.valueOf(s.length()));
-//            String Bounds[] = new String[] {s.readLine(), s.readLine(), s.readLine(), s.readLine()};
             int Bounds[] = new int[] {Integer.parseInt(s.readLine()), Integer.parseInt(s.readLine()), Integer.parseInt(s.readLine()), Integer.parseInt(s.readLine())};
-            Bukkit.broadcastMessage(Bounds.toString());
             String name = s.readLine();
             return new Destination(Bounds, name); 
         }catch(NumberFormatException e){
@@ -139,5 +135,44 @@ public class DBmanager {
             System.out.println("Bad Destination File " + ex.toString());
             return null;
         }
+    }
+    
+    public static void saveBan(Infraction inf){
+        File save = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + inf.getOBuuid().toString() + ".obdat");
+        Record r = null;
+        if(save.exists()){
+            try {
+                r = EnforcerSuite.getJSonParser().readValue(save, Record.class);
+            } catch (IOException ex) {
+                Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+                return;
+            }
+        }else{
+            r = new Record();
+            r.setOB(inf.getOBuuid());
+        }
+        r.getInfractions().add(DBmanager.OBs.get(inf.getOBuuid()));
+//        DBmanager.OBs.remove(inf.getOBuuid());
+//        File OldInf = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + inf.getOBuuid().toString() + ".obdat");
+//        OldInf.delete();
+        File saveStart = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + inf.getOBuuid().toString() + ".new.obdat");
+        File saveFin = new File(OBFiles + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + inf.getOBuuid().toString() + ".obdat");
+        if(saveFin.exists()&&saveStart.exists()){
+            saveFin.delete();
+            saveFin.renameTo(saveFin);
+        }
+        boolean successful = true;
+        try {
+            EnforcerSuite.getJSonParser().writeValue(saveStart, r);
+         } catch (IOException ex) {
+             successful = false;
+         } finally {
+             if (successful) {
+                 if (saveFin.exists()) {
+                     saveFin.delete();
+                 }
+                 saveStart.renameTo(saveFin);
+             }
+         }
     }
 }

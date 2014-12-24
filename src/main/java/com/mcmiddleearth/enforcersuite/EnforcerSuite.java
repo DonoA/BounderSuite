@@ -52,7 +52,7 @@ public class EnforcerSuite extends JavaPlugin{
         plugin = this;
         PluginManager pm = this.getServer().getPluginManager();
         pm.registerEvents(new LoginListen(), this);
-        getCommand("ob").setExecutor(new Commands());
+        getCommand("punish").setExecutor(new Commands());
         getCommand("done").setExecutor(new Commands());
         MainWorld = Bukkit.getWorld(this.getConfig().getString("MainWorld"));
         servlet = new Servlet(port);

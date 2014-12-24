@@ -24,11 +24,8 @@ import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import com.mcmiddleearth.enforcersuite.Infraction;
 import com.mcmiddleearth.enforcersuite.Record;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -42,11 +39,10 @@ public class ServletDBmanager {
     
     private static File DB = new File(EnforcerSuite.getPlugin().getDataFolder() + System.getProperty("file.separator") + "OB-DB");
     
-    public static HashMap<String, RequestKey> Keys = new HashMap<>();
+    public static List<Infraction> Incomplete = new ArrayList<>();
     
     public static Record getOBrecord(UUID ob){
         File save = new File(DB + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + ob.toString() + ".obdat");
-        Record r = null;
         if(save.exists()){
             try {
                 return EnforcerSuite.getJSonParser().readValue(save, Record.class);
@@ -54,7 +50,7 @@ public class ServletDBmanager {
                 Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        r = new Record();
+        Record r = new Record();
         r.setOB(new UUID(0,0));
         return r;
     }
@@ -76,7 +72,11 @@ public class ServletDBmanager {
             for(File f : new File(DB + System.getProperty("file.separator") + "Current").listFiles()){
                 try {
                     Infraction inf = EnforcerSuite.getJSonParser().readValue(f, Infraction.class);
-                    rtn.add(f.getName().replace(".obdat", "") + " - " + inf.getOBname());
+                    if(inf.getOBname() != null){
+                        rtn.add(f.getName().replace(".obdat", "") + " - " + inf.getOBname());
+                    }else{
+                        rtn.add(f.getName().replace(".obdat", ""));
+                    }
                 } catch (IOException ex) {}
             }
         }else{

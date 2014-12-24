@@ -67,6 +67,9 @@ public class Infraction {
     @Getter @Setter @JsonIgnore
     private UUID OBuuid;
     
+    @Getter @Setter
+    private boolean ban = false;
+    
     public Infraction(int sev, String rank, Player enforcer, UUID OB){
         this.Destination = DBmanager.LoadDest(sev);
         this.rank = rank;
