@@ -6,10 +6,10 @@ description: makes OBing a player easier
 author: DonoA
 authors: [DonoA, aaldim]
 commands:
-  ob:
+  punish:
     description: OathBreaker a player
     usage: |
-            /ob <player> <severity>
+            /punish <player> <severity>
   done:
     description: finish your OB
     usage: |
