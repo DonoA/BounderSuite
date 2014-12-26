@@ -4,9 +4,11 @@
  * and open the template in the editor.
  */
 
-package com.mcmiddleearth.enforcersuite;
+package com.mcmiddleearth.enforcersuite.Commands;
 
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
+import com.mcmiddleearth.enforcersuite.EnforcerSuite;
+import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import com.mcmiddleearth.enforcersuite.Servlet.ServletDBmanager;
 import java.util.Date;
 import java.util.UUID;
@@ -24,7 +26,7 @@ import org.bukkit.entity.Player;
  */
 public class Commands implements CommandExecutor{
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd,String Label, String[] args){
+    public boolean onCommand(CommandSender sender, Command cmd, String Label, String[] args){
         Player p = (Player) sender;
         
         //punish <ob|ban> <name|uuid> <1 | 2> [convo]
@@ -45,7 +47,7 @@ public class Commands implements CommandExecutor{
             }catch (Exception e){
                 op = Bukkit.getOfflinePlayer(args[1]);
             }
-            if(op.isOnline()){ //this line still works :P
+            if(op.isOnline()){
                 Player ob = op.getPlayer();
                 if(args[0].equalsIgnoreCase("ob")){
                     if(!DBmanager.OBs.containsKey(ob.getUniqueId())){
@@ -56,7 +58,7 @@ public class Commands implements CommandExecutor{
                         for(int j=0; j <= 3; j++){
                             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + ob.getName());
                         }
-                        DBmanager.save(ob.getUniqueId()); //save OB to file
+                        DBmanager.saveOB(ob.getUniqueId()); //save OB to file
 
                         p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+ob.getName());
                         p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + ob.getUniqueId().toString());
@@ -71,13 +73,14 @@ public class Commands implements CommandExecutor{
                         if(op.hasPlayedBefore()){
                             Infraction inf = new Infraction(Integer.parseInt(args[2]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, ob.getUniqueId(), ob.getName());
                             inf.setBan(true);
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + ob.getName());
-                            DBmanager.saveBan(inf);
+                            DBmanager.Bans.put(op.getUniqueId(), inf);
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + op.getName());
+                            DBmanager.saveBan(op.getUniqueId());
                             p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+ob.getName());
                             p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + ob.getUniqueId().toString());
                             ServletDBmanager.Incomplete.add(inf);
                         }else{
-                            
+                            p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
                         }
                     }else{
                         p.sendMessage(EnforcerSuite.getPrefix()+ob.getName() + " is already banned!");
@@ -87,27 +90,32 @@ public class Commands implements CommandExecutor{
                 }
             }else{
                 if(args[0].equalsIgnoreCase("ob")){
-                    if(op.hasPlayedBefore()){
-                        Infraction inf = new Infraction(Integer.parseInt(args[2]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, op.getUniqueId());
-                        DBmanager.OBs.put(op.getUniqueId(), inf);
-                        for(int j=0; j <= 3; j++){
-                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + op.getName());
+                    if(!DBmanager.loadOB(op.getUniqueId())){
+                        if(op.hasPlayedBefore()){
+                            Infraction inf = new Infraction(Integer.parseInt(args[2]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, op.getUniqueId());
+                            DBmanager.OBs.put(op.getUniqueId(), inf);
+                            for(int j=0; j <= 3; j++){
+                                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + op.getName());
+                            }
+                            DBmanager.saveOB(op.getUniqueId());
+                            DBmanager.OBs.remove(op.getUniqueId());
+                            p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+op.getName());
+                            p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + op.getUniqueId().toString());
+                            ServletDBmanager.Incomplete.add(inf);
+                        }else{
+                            p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
                         }
-                        DBmanager.save(op.getUniqueId());
-                        DBmanager.OBs.remove(op.getUniqueId());
-                        p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+op.getName());
-                        p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + op.getUniqueId().toString());
-                        ServletDBmanager.Incomplete.add(inf);
                     }else{
-                        p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
+                        p.sendMessage(EnforcerSuite.getPrefix() + "That player is already OB!");
                     }
                 }else if(args[0].equalsIgnoreCase("ban")){
                     if(!op.isBanned()){
                         if(op.hasPlayedBefore()){
                             Infraction inf = new Infraction(Integer.parseInt(args[2]), /*PermissionsEx.getUser(op.getName()).getPrefix()*/ "none", p, op.getUniqueId(), op.getName());
                             inf.setBan(true);
+                            DBmanager.Bans.put(op.getUniqueId(), inf);
                             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + op.getName());
-                            DBmanager.saveBan(inf);
+                            DBmanager.saveBan(op.getUniqueId());
                             p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+op.getName());
                             p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + op.getUniqueId().toString());
                             ServletDBmanager.Incomplete.add(inf);
@@ -139,7 +147,7 @@ public class Commands implements CommandExecutor{
                         ob.setFinished(new Date());
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "promote " + p.getName());
                         ob.setRePromoted(true);
-                        DBmanager.archive(p.getUniqueId());
+                        DBmanager.archiveOB(p.getUniqueId());
                     }
                 }else{
                     p.sendMessage("You have not reached your location");

@@ -17,11 +17,12 @@
  * 
  */
 
-package com.mcmiddleearth.enforcersuite;
+package com.mcmiddleearth.enforcersuite.Records;
 
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
-import com.mcmiddleearth.enforcersuite.Infraction;
+import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
@@ -36,7 +37,10 @@ public class Record {
     private UUID OB;
     
     @Getter @Setter
-    private List<Infraction> infractions = new ArrayList<>();
+    private HashMap<Integer, Infraction> oldInfractions = new HashMap<>();
+    
+    @Getter @Setter
+    private Infraction CurrentInfraction;
     
 //    @Getter @Setter
 //    private List<String> Names = new ArrayList<>();
@@ -44,7 +48,7 @@ public class Record {
     public Record(){}
     
     public boolean Archive(){//wip
-        DBmanager.archive(OB);
+        DBmanager.archiveOB(OB);
         return false;
     }
 }

@@ -17,7 +17,7 @@
  * 
  */
 
-package com.mcmiddleearth.enforcersuite;
+package com.mcmiddleearth.enforcersuite.Records;
 
 import lombok.Getter;
 import lombok.Setter;
