@@ -19,26 +19,25 @@
 
 package com.mcmiddleearth.enforcersuite.Servlet;
 
+import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
-import com.mcmiddleearth.enforcersuite.Infraction;
+import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -51,15 +50,27 @@ public class ServletHandle extends AbstractHandler{
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String[] args = target.split("/");
         response.setHeader("Server", EnforcerSuite.getPrefix());
-        if(args.length>=1){
+        if(args.length>=2){
             if(args[1].equalsIgnoreCase("current")){
-                baseRequest.setHandled(true);
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().print(ServletDBmanager.getOBs(true));
+                if(args[2].equalsIgnoreCase("ob")){
+                    baseRequest.setHandled(true);
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().print(ServletDBmanager.getOBs(true));
+                }else if(args[2].equalsIgnoreCase("ban")){
+                    baseRequest.setHandled(true);
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().print(ServletDBmanager.getBans(true));
+                }
             }else if(args[1].equalsIgnoreCase("archive")){
-                baseRequest.setHandled(true);
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().print(ServletDBmanager.getOBs(false));
+                if(args[2].equalsIgnoreCase("ob")){
+                    baseRequest.setHandled(true);
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().print(ServletDBmanager.getOBs(false));
+                }else if(args[2].equalsIgnoreCase("ban")){
+                    baseRequest.setHandled(true);
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().print(ServletDBmanager.getBans(false));
+                }
             }else if(args[1].equalsIgnoreCase("files") && args.length>=2){
                 UUID requestUUID;
                 try{
@@ -70,9 +81,9 @@ public class ServletHandle extends AbstractHandler{
                 baseRequest.setHandled(true);
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter().println("Current:");
-                response.getWriter().print(EnforcerSuite.getJSonParser().writeValueAsString(ServletDBmanager.loadReturn(requestUUID)) + "\n");
+                response.getWriter().print(EnforcerSuite.getJSonParser().writeValueAsString(ServletDBmanager.getRecord(requestUUID).getCurrentInfraction()) + "\n");
                 response.getWriter().println("Archived:");
-                response.getWriter().print(EnforcerSuite.getJSonParser().writeValueAsString(ServletDBmanager.getOBrecord(requestUUID)) + "\n");
+                response.getWriter().print(EnforcerSuite.getJSonParser().writeValueAsString(ServletDBmanager.getRecord(requestUUID).getOldInfractions()) + "\n");
             }
         }
     }
@@ -102,17 +113,112 @@ public class ServletHandle extends AbstractHandler{
                                     rtn.add(inf.getOBname() + " - " + inf.getOBuuid().toString() + " - " + inf.isBan());
                                 }
                             }
-                            System.out.println(EnforcerSuite.getJSonParser().writeValueAsString(rtn));
+                            System.out.println("Pinged!");
                             outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtn));
                         }else if(clientSentence.contains("fetch")){
                             for(Infraction inf : ServletDBmanager.Incomplete){
                                 if(clientSentence.contains(inf.getOBuuid().toString())){
-//                                    System.out.println("fetch: " + EnforcerSuite.getJSonParser().writeValueAsString(inf));
                                     outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(inf));
                                 }
                             }
-                        }else if(clientSentence.contains("return")){
-                            System.out.println(clientSentence);
+                        }else if(clientSentence.contains("return")){ //only works with OBs in the current folder D:
+                            clientSentence = clientSentence.substring(clientSentence.indexOf("$")+1);
+                            ReturnClass rtnclss = EnforcerSuite.getJSonParser().readValue(clientSentence, ReturnClass.class);
+                            Infraction inf = null;
+                            for(Infraction i: ServletDBmanager.Incomplete){
+                                if(clientSentence.contains(i.getOBuuid().toString())){
+                                    inf = i;
+                                    ServletDBmanager.Incomplete.remove(i);
+//                                    break; idk how dis works
+                                }
+                            }
+                            if(inf == null){
+                                return;
+                            }
+                            //bans
+                            if(rtnclss.getBannedOn().isBuild()){
+                                inf.getBannedOn().add("build");
+                                if(rtnclss.getBannedOn().isEauto()){
+                                    //ban them
+                                }
+                            }
+                            if(rtnclss.getBannedOn().isFreebuild()){
+                                inf.getBannedOn().add("freebuild");
+                                if(rtnclss.getBannedOn().isEauto()){
+                                    //ban them
+                                }
+                            }
+                            if(rtnclss.getBannedOn().isTeamspeak()){
+                                inf.getBannedOn().add("teamspeak");
+                                if(rtnclss.getBannedOn().isEauto()){
+                                    //ban them
+                                }
+                            }
+                            if(rtnclss.getBannedOn().isForums()){
+                                inf.getBannedOn().add("forums");
+                            }
+                            if(rtnclss.getBannedOn().isOthercheck()){
+                                inf.getBannedOn().add(rtnclss.getBannedOn().getOthertxt());
+                            }
+                            //reasons
+                            if(rtnclss.getReasons().isBlocks()){
+                                inf.getReasons().add("Unauthorised Block Break/Place");
+                                if(rtnclss.getReasons().isEauto()){
+                                    //Collect Evidence
+                                }
+                            }
+                            if(rtnclss.getReasons().isSpam()){
+                                inf.getReasons().add("Spamming Chat");
+                                if(rtnclss.getReasons().isEauto()){
+                                    //Collect Evidence
+                                }
+                            }
+                            if(rtnclss.getReasons().isSocial()){
+                                inf.getReasons().add("Social Indiscretion (Inappropriate Username, Profane/Derogatory Language, Political/Religious Discussions, Referencing Vulgar/Explicit Material)");
+                            }
+                            if(rtnclss.getReasons().isIgnoring()){
+                                inf.getReasons().add("Ignoring Staff Direction / Impeding Work");
+                            }
+                            if(rtnclss.getReasons().isImpersonating()){
+                                inf.getReasons().add("Impersonating Staff Member");
+                            }
+                            if(rtnclss.getReasons().isMods()){
+                                inf.getReasons().add("Use of Detrimental 3rd Party Mods");
+                            }
+                            if(rtnclss.getReasons().isAds()){
+                                inf.getReasons().add("Advertising");
+                                if(rtnclss.getReasons().isEauto()){
+                                    //Collect Evidence
+                                }
+                            }
+                            if(rtnclss.getReasons().isObassist()){
+                                inf.getReasons().add("Assisting Oathbreakers");
+                                if(rtnclss.getReasons().isEauto()){
+                                    //Collect Evidence
+                                }
+                            }
+                            if(rtnclss.getReasons().isTeamspeak()){
+                                inf.getReasons().add("TeamSpeak (Infractions)");
+                            }
+                            if(rtnclss.getReasons().isAlt()){
+                                inf.getReasons().add("Alt Account");
+                            }
+                            if(rtnclss.getReasons().isOthercheck()){
+                                inf.getReasons().add(rtnclss.getReasons().getOthertxt());
+                            }
+                            inf.getEvidence().add(rtnclss.getEvidence());
+                            inf.setNotes(rtnclss.getNotes());
+                            DBmanager.OBs.put(UUID.fromString(rtnclss.getObuuid()), inf);
+                            DBmanager.saveOB(UUID.fromString(rtnclss.getObuuid()));
+                            if(!Bukkit.getPlayer(UUID.fromString(rtnclss.getObuuid())).isOnline()){
+                                DBmanager.OBs.remove(UUID.fromString(rtnclss.getObuuid()));
+                            }
+                        }else if(clientSentence.contains("request")){
+                            clientSentence = clientSentence.substring(clientSentence.indexOf("$")+1);
+                            RequestType request = EnforcerSuite.getJSonParser().readValue(clientSentence, RequestType.class);
+                            if(request.getBase().equalsIgnoreCase("archive")){
+                                DBmanager.archiveBan(UUID.fromString(request.getArgs()[0]));
+                            }
                         }
                             
                     } catch (IOException ex) {
@@ -125,5 +231,15 @@ public class ServletHandle extends AbstractHandler{
             
             
         }
+    }
+    
+    public class RequestType{
+        @Getter @Setter
+        private String base;
+        @Getter @Setter
+        private String[] args;
+        
+        public RequestType(){}
+        
     }
 }

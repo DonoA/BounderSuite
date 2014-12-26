@@ -21,8 +21,8 @@ package com.mcmiddleearth.enforcersuite.Servlet;
 
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
-import com.mcmiddleearth.enforcersuite.Infraction;
-import com.mcmiddleearth.enforcersuite.Record;
+import com.mcmiddleearth.enforcersuite.Records.Infraction;
+import com.mcmiddleearth.enforcersuite.Records.Record;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,8 +41,8 @@ public class ServletDBmanager {
     
     public static List<Infraction> Incomplete = new ArrayList<>();
     
-    public static Record getOBrecord(UUID ob){
-        File save = new File(DB + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + ob.toString() + ".obdat");
+    public static Record getRecord(UUID ob){
+        File save = new File(DB + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + ob.toString() + ".record");
         if(save.exists()){
             try {
                 return EnforcerSuite.getJSonParser().readValue(save, Record.class);
@@ -54,8 +54,19 @@ public class ServletDBmanager {
         r.setOB(new UUID(0,0));
         return r;
     }
-    public static Infraction loadReturn(UUID uuid){
-        File save = new File(DB + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
+    public static Infraction loadReturnOB(UUID uuid){
+        File save = new File(DB + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + "OB" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
+        if(!save.exists())
+            return new Infraction();
+        try {
+            return EnforcerSuite.getJSonParser().readValue(save, Infraction.class);
+        } catch (IOException ex) {
+            Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+            return new Infraction();
+        }
+    }
+    public static Infraction loadReturnBan(UUID uuid){
+        File save = new File(DB + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + "Ban" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
         if(!save.exists())
             return new Infraction();
         try {
@@ -69,7 +80,7 @@ public class ServletDBmanager {
     public static List<String> getOBs(boolean curr){
         List<String> rtn = new ArrayList<>();
         if(curr){
-            for(File f : new File(DB + System.getProperty("file.separator") + "Current").listFiles()){
+            for(File f : new File(DB + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + "OB").listFiles()){
                 try {
                     Infraction inf = EnforcerSuite.getJSonParser().readValue(f, Infraction.class);
                     if(inf.getOBname() != null){
@@ -83,13 +94,64 @@ public class ServletDBmanager {
             for(File f : new File(DB + System.getProperty("file.separator") + "Archive").listFiles()){
                 try {
                     Record rcrd = EnforcerSuite.getJSonParser().readValue(f, Record.class);
-                    String s = rcrd.getOB().toString() + " - ";
-                    for(Infraction inf : rcrd.getInfractions()){
-                        if(!s.contains(inf.getOBname())){
-                            s += inf.getOBname();
+                    boolean isBan = false;
+                    for(Infraction i : rcrd.getOldInfractions().values()){
+                        if(i.isBan()){
+                            isBan = true;
                         }
                     }
-                    rtn.add(s);
+                    if(!isBan){
+                        String s = rcrd.getOB().toString() + " - ";
+                        for(Infraction inf : rcrd.getOldInfractions().values()){
+                            if(inf.getOBname() != null){
+                                if(!s.contains(inf.getOBname())){
+                                    s += inf.getOBname() + "  ";
+                                }
+                            }
+                        }
+                        rtn.add(s);
+                    }
+                } catch (IOException ex) {}
+            }
+        }
+        return rtn;
+    }
+    
+    public static List<String> getBans(boolean curr){
+        List<String> rtn = new ArrayList<>();
+        if(curr){
+            for(File f : new File(DB + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + "Ban").listFiles()){
+                try {
+                    Infraction inf = EnforcerSuite.getJSonParser().readValue(f, Infraction.class);
+                    if(inf.getOBname() != null){
+                        rtn.add(f.getName().replace(".obdat", "") + " - " + inf.getOBname());
+                    }else{
+                        rtn.add(f.getName().replace(".obdat", ""));
+                    }
+                } catch (IOException ex) {}
+            }
+        }else{
+            for(File f : new File(DB + System.getProperty("file.separator") + "Archive").listFiles()){
+                try {
+                    
+                    Record rcrd = EnforcerSuite.getJSonParser().readValue(f, Record.class);
+                    boolean isBan = false;
+                    for(Infraction i : rcrd.getOldInfractions().values()){
+                        if(i.isBan()){
+                            isBan = true;
+                        }
+                    }
+                    if(isBan){
+                        String s = rcrd.getOB().toString() + " - ";
+                        for(Infraction inf : rcrd.getOldInfractions().values()){
+                            if(inf.getOBname() != null){
+                                if(!s.contains(inf.getOBname())){
+                                    s += inf.getOBname() + "  ";
+                                }
+                            }
+                        }
+                        rtn.add(s);
+                    }
                 } catch (IOException ex) {}
             }
         }

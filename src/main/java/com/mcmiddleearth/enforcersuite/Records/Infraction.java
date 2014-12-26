@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.mcmiddleearth.enforcersuite;
+package com.mcmiddleearth.enforcersuite.Records;
 
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import java.util.ArrayList;

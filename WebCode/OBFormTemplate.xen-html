@@ -1,5 +1,4 @@
-
-<xen:title>OathBreaker Form</xen:title>
+<xen:title>Infraction Form</xen:title>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
@@ -16,7 +15,7 @@
 			<br>
 		</xen:foreach>
 		<a id="new">
-			<button type="button" onClick="<xen:callback class='Dev_PageCallback_OBformPHP' method='getHTML'>'new'</xen:callback>">Create new OB</button>
+			<button type="button" onClick="<xen:callback class='Dev_PageCallback_OBformPHP' method='getHTML'>new</xen:callback>">Create new OB</button>
 		</a>
 	</li>
 	
@@ -24,11 +23,40 @@
 </font>
 <script>
 function Update(){
+	
          $.ajax({ 
 	 type: "POST",
 	 url: '/OBFormReturn.php',
-         data: {arguments: {firstName:"John", lastName:"Doe", age:50, eyeColor:"blue"}},
-         success: alert("Updated")
+         data: {arguments: {
+         obuuid: document.getElementById('obuuid').innerHTML,
+         bannedOn:{
+         	build: document.getElementById('B0').checked, 
+         	freebuild: document.getElementById('B1').checked, 
+         	teamspeak: document.getElementById('B2').checked, 
+         	forums: document.getElementById('B3').checked, 
+         	othercheck: document.getElementById('B4').checked, 
+         	othertxt: document.getElementById('B5').value,
+         	eauto: document.getElementById('BAuto').checked
+         },
+         reasons:{
+         	blocks: document.getElementById('R0').checked,
+         	spam: document.getElementById('R1').checked,
+         	social: document.getElementById('R2').checked,
+         	ignoring: document.getElementById('R3').checked,
+         	impersonating: document.getElementById('R4').checked,
+         	mods: document.getElementById('R5').checked,
+         	ads: document.getElementById('R6').checked,
+         	obassist: document.getElementById('R7').checked,
+         	teamspeak: document.getElementById('R8').checked,
+         	alt: document.getElementById('R9').checked,
+         	othercheck: document.getElementById('R10').checked,
+         	othertxt: document.getElementById('R11').value,
+         	eauto: document.getElementById('RAuto').checked,
+         }, 
+         evidence: document.getElementById('evidence').value, 
+         notes: document.getElementById('notes').value
+         }},
+         success: alert("Updated"); location.reload();
 	});
 }
 </script>

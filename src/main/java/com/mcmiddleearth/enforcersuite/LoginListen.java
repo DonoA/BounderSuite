@@ -19,6 +19,7 @@
 
 package com.mcmiddleearth.enforcersuite;
 
+import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import java.util.Date;
 import org.bukkit.Bukkit;
@@ -37,7 +38,7 @@ public class LoginListen implements Listener{
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         Player p = e.getPlayer();
-        if(DBmanager.load(p.getUniqueId())){//if they are ob
+        if(DBmanager.loadOB(p.getUniqueId())){//if they are ob
             Infraction curr = DBmanager.OBs.get(p.getUniqueId());
             curr.setOBname(p.getName());
             if(!curr.isStarted()){
@@ -48,7 +49,7 @@ public class LoginListen implements Listener{
                 if(curr.getFinished().before(new Date(System.currentTimeMillis() - (86400 * 7 * 1000)))){//if finished is before today minus one week...
                     p.sendMessage(ChatColor.YELLOW + "You are no longer OB");
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "promote " + p.getName());
-                    DBmanager.archive(p.getUniqueId());
+                    DBmanager.archiveOB(p.getUniqueId());
                 }else{
                     p.sendMessage(ChatColor.YELLOW + "You are OB until: " + ChatColor.RED + new Date(curr.getFinished().getTime() + (86400 * 7 * 1000)).toString());
                 }
@@ -62,7 +63,7 @@ public class LoginListen implements Listener{
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player p = event.getPlayer();
         if(DBmanager.OBs.containsKey(p.getUniqueId())){
-            DBmanager.save(p.getUniqueId());
+            DBmanager.saveOB(p.getUniqueId());
             DBmanager.OBs.remove(p.getUniqueId());
         }
     }
