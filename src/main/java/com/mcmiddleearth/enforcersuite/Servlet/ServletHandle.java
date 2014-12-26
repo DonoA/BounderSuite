@@ -19,6 +19,7 @@
 
 package com.mcmiddleearth.enforcersuite.Servlet;
 
+import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import com.mcmiddleearth.enforcersuite.Infraction;
 import java.io.BufferedReader;
@@ -102,17 +103,106 @@ public class ServletHandle extends AbstractHandler{
                                     rtn.add(inf.getOBname() + " - " + inf.getOBuuid().toString() + " - " + inf.isBan());
                                 }
                             }
-                            System.out.println(EnforcerSuite.getJSonParser().writeValueAsString(rtn));
+                            System.out.println("Pinged!");
                             outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtn));
                         }else if(clientSentence.contains("fetch")){
                             for(Infraction inf : ServletDBmanager.Incomplete){
                                 if(clientSentence.contains(inf.getOBuuid().toString())){
-//                                    System.out.println("fetch: " + EnforcerSuite.getJSonParser().writeValueAsString(inf));
                                     outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(inf));
                                 }
                             }
-                        }else if(clientSentence.contains("return")){
-                            System.out.println(clientSentence);
+                        }else if(clientSentence.contains("return")){ //only works with OBs in the current folder D:
+                            clientSentence = clientSentence.substring(clientSentence.indexOf("$")+1);
+                            ReturnClass rtnclss = EnforcerSuite.getJSonParser().readValue(clientSentence, ReturnClass.class);
+                            Infraction inf = null;
+                            for(Infraction i: ServletDBmanager.Incomplete){
+                                if(clientSentence.contains(i.getOBuuid().toString())){
+                                    inf = i;
+                                    ServletDBmanager.Incomplete.remove(i);
+//                                    break; idk how dis works
+                                }
+                            }
+                            if(inf == null){
+                                return;
+                            }
+                            //bans
+                            if(rtnclss.getBannedOn().isBuild()){
+                                inf.getBannedOn().add("build");
+                                if(rtnclss.getBannedOn().isEauto()){
+                                    //ban them
+                                }
+                            }
+                            if(rtnclss.getBannedOn().isFreebuild()){
+                                inf.getBannedOn().add("freebuild");
+                                if(rtnclss.getBannedOn().isEauto()){
+                                    //ban them
+                                }
+                            }
+                            if(rtnclss.getBannedOn().isTeamspeak()){
+                                inf.getBannedOn().add("teamspeak");
+                                if(rtnclss.getBannedOn().isEauto()){
+                                    //ban them
+                                }
+                            }
+                            if(rtnclss.getBannedOn().isForums()){
+                                inf.getBannedOn().add("forums");
+                            }
+                            if(rtnclss.getBannedOn().isOthercheck()){
+                                inf.getBannedOn().add(rtnclss.getBannedOn().getOthertxt());
+                            }
+                            //reasons
+                            if(rtnclss.getReasons().isBlocks()){
+                                inf.getReasons().add("Unauthorised Block Break/Place");
+                                if(rtnclss.getReasons().isEauto()){
+                                    //Collect Evidence
+                                }
+                            }
+                            if(rtnclss.getReasons().isSpam()){
+                                inf.getReasons().add("Spamming Chat");
+                                if(rtnclss.getReasons().isEauto()){
+                                    //Collect Evidence
+                                }
+                            }
+                            if(rtnclss.getReasons().isSocial()){
+                                inf.getReasons().add("Social Indiscretion (Inappropriate Username, Profane/Derogatory Language, Political/Religious Discussions, Referencing Vulgar/Explicit Material)");
+                            }
+                            if(rtnclss.getReasons().isIgnoring()){
+                                inf.getReasons().add("Ignoring Staff Direction / Impeding Work");
+                            }
+                            if(rtnclss.getReasons().isImpersonating()){
+                                inf.getReasons().add("Impersonating Staff Member");
+                            }
+                            if(rtnclss.getReasons().isMods()){
+                                inf.getReasons().add("Use of Detrimental 3rd Party Mods");
+                            }
+                            if(rtnclss.getReasons().isAds()){
+                                inf.getReasons().add("Advertising");
+                                if(rtnclss.getReasons().isEauto()){
+                                    //Collect Evidence
+                                }
+                            }
+                            if(rtnclss.getReasons().isObassist()){
+                                inf.getReasons().add("Assisting Oathbreakers");
+                                if(rtnclss.getReasons().isEauto()){
+                                    //Collect Evidence
+                                }
+                            }
+                            if(rtnclss.getReasons().isTeamspeak()){
+                                inf.getReasons().add("TeamSpeak (Infractions)");
+                            }
+                            if(rtnclss.getReasons().isAlt()){
+                                inf.getReasons().add("Alt Account");
+                            }
+                            if(rtnclss.getReasons().isOthercheck()){
+                                inf.getReasons().add(rtnclss.getReasons().getOthertxt());
+                            }
+                            inf.getEvidence().add(rtnclss.getEvidence());
+                            inf.setNotes(rtnclss.getNotes());
+                            DBmanager.OBs.put(UUID.fromString(rtnclss.getObuuid()), inf);
+                            DBmanager.save(UUID.fromString(rtnclss.getObuuid()));
+                            if(!Bukkit.getPlayer(UUID.fromString(rtnclss.getObuuid())).isOnline()){
+                                DBmanager.OBs.remove(UUID.fromString(rtnclss.getObuuid()));
+                            }
                         }
                             
                     } catch (IOException ex) {
