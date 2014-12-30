@@ -17,10 +17,11 @@
  * 
  */
 
-package com.mcmiddleearth.enforcersuite;
+package com.mcmiddleearth.enforcersuite.Listeners;
 
 import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
+import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import java.util.Date;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
