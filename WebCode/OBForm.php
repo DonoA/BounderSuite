@@ -8,11 +8,11 @@ class Dev_PageCallback_OBForm{
         $errstr = '';
         $errno = '';
 
-        if ( ($fp = fsockopen($host, $port, $errno, $errstr, 3) ) === FALSE)
-            $obs = array();
-        else {
+        if ( ($fp = fsockopen($host, $port, $errno, $errstr, 3) ) === FALSE){
+            $obs = array('fail to connect to database');
+        }else{
             fwrite($fp, $data);
-            while (! feof($fp)) {
+            while(! feof($fp)){
                 $obs = json_decode(fgets($fp, 4096));
             }
             fclose($fp);

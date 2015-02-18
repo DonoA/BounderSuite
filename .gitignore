@@ -1,2 +1,6 @@
 /target/
 /AutoRelocate.cmd
+/EnforcerManager/build/
+/EnforcerManager/nbproject/private/
+/EnforcerManager/manifest.mf
+/EnforcerManager/nbproject/
