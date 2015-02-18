@@ -1,7 +1,20 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This file is part of BoundHelper.
+ * 
+ * BoundHelper is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * BoundHelper is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with BoundHelper.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * 
  */
 
 package com.mcmiddleearth.enforcersuite.Commands;
@@ -76,14 +89,14 @@ public class Commands implements CommandExecutor{
                             DBmanager.Bans.put(op.getUniqueId(), inf);
                             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + op.getName());
                             DBmanager.saveBan(op.getUniqueId());
-                            p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+ob.getName());
-                            p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + ob.getUniqueId().toString());
+                            p.sendMessage(EnforcerSuite.getPrefix()+"You have Banned "+ob.getName());
+                            p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this Ban, uuid " + ob.getUniqueId().toString());
                             ServletDBmanager.Incomplete.add(inf);
                         }else{
                             p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
                         }
                     }else{
-                        p.sendMessage(EnforcerSuite.getPrefix()+ob.getName() + " is already banned!");
+                        p.sendMessage(EnforcerSuite.getPrefix()+ob.getName() + " is already Banned!");
                     }
                 }else{
                     return false;
@@ -116,14 +129,14 @@ public class Commands implements CommandExecutor{
                             DBmanager.Bans.put(op.getUniqueId(), inf);
                             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + op.getName());
                             DBmanager.saveBan(op.getUniqueId());
-                            p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+op.getName());
-                            p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + op.getUniqueId().toString());
+                            p.sendMessage(EnforcerSuite.getPrefix()+"You have Banned "+op.getName());
+                            p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this Ban, uuid " + op.getUniqueId().toString());
                             ServletDBmanager.Incomplete.add(inf);
                         }else{
                             p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
                         }
                     }else{
-                        p.sendMessage(EnforcerSuite.getPrefix()+op.getName() + " is already banned!");
+                        p.sendMessage(EnforcerSuite.getPrefix()+op.getName() + " is already Banned!");
                     }
                 }else{
                     return false;

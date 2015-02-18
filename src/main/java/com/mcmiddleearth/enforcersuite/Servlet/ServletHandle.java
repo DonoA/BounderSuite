@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 /**
@@ -108,12 +109,21 @@ public class ServletHandle extends AbstractHandler{
                             rtn.clear();
                             for(Infraction inf : ServletDBmanager.Incomplete){
                                 if(inf.getOBname() == null){
-                                    rtn.add(inf.getOBuuid().toString() + " - " + inf.isBan());
+                                    if(inf.isBan()){
+                                        rtn.add(inf.getOBuuid().toString() + " - Ban");
+                                    }else{
+                                        rtn.add(inf.getOBuuid().toString() + " - OathBreaker");
+                                    }
                                 }else{
-                                    rtn.add(inf.getOBname() + " - " + inf.getOBuuid().toString() + " - " + inf.isBan());
+                                    if(inf.isBan()){
+                                        rtn.add(inf.getOBname() + " - " + inf.getOBuuid().toString() + " - Ban");
+                                    }else{
+                                        rtn.add(inf.getOBname() + " - " + inf.getOBuuid().toString() + " - OathBreaker");
+                                    }
                                 }
                             }
-                            System.out.println("Pinged!");
+                            if(EnforcerSuite.isDebug())
+                                Bukkit.getLogger().log(Level.INFO, "{0}Successful Ping", ChatColor.GREEN);
                             outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtn));
                         }else if(clientSentence.contains("fetch")){
                             for(Infraction inf : ServletDBmanager.Incomplete){

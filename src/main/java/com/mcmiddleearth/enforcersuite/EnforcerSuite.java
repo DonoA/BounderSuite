@@ -1,7 +1,20 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This file is part of BoundHelper.
+ * 
+ * BoundHelper is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * BoundHelper is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with BoundHelper.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * 
  */
 
 package com.mcmiddleearth.enforcersuite;
@@ -44,6 +57,9 @@ public class EnforcerSuite extends JavaPlugin{
     
     @Getter
     private static ObjectMapper JSonParser;
+    
+    @Getter
+    private static boolean Debug;
             
     @Override
     public void onEnable(){
@@ -52,6 +68,7 @@ public class EnforcerSuite extends JavaPlugin{
         int port = this.getConfig().getInt("port");
         JSonParser = new ObjectMapper();
         plugin = this;
+        Debug = this.getConfig().getBoolean("debug");
         PluginManager pm = this.getServer().getPluginManager();
         pm.registerEvents(new LoginListen(), this);
         getCommand("punish").setExecutor(new Commands());

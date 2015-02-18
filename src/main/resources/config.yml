@@ -1,2 +1,3 @@
 port: 1337
+debug: true
 MainWorld: "world"

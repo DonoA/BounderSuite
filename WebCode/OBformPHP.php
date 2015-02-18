@@ -9,9 +9,9 @@ class Dev_PageCallback_OBFormPHP{
             $errstr = '';
             $errno = '';
 
-            if ( ($fp = fsockopen($host, $port, $errno, $errstr, 3) ) === FALSE)
-                $obdat = array();
-            else {
+            if ( ($fp = fsockopen($host, $port, $errno, $errstr, 3) ) === FALSE){
+                $obdat = array('Failed to connect to database');
+            }else{
                 fwrite($fp, $data);
                 while (! feof($fp)) {
                     $data = fgets($fp, 4096);
