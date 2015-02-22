@@ -14,4 +14,8 @@ commands:
     description: finish your OB
     usage: |
             /done
+  getinfo:
+    description: Get info on a player
+    usage: |
+            /getinfo
     

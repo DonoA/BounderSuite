@@ -23,8 +23,11 @@ import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import com.mcmiddleearth.enforcersuite.Servlet.ServletDBmanager;
+import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -165,6 +168,24 @@ public class Commands implements CommandExecutor{
                 }else{
                     p.sendMessage("You have not reached your location");
                     p.sendMessage("Destination: " + ob.getDestination().getName());
+                }
+                return true;
+            }
+        }else if(cmd.getName().equalsIgnoreCase("getinfo") && p.hasPermission("enforcerHelper.punish") && args.length>0){
+            OfflinePlayer op;
+            try{
+                op = Bukkit.getOfflinePlayer(UUID.fromString(args[0]));
+            }catch (Exception e){
+                op = Bukkit.getOfflinePlayer(args[0]);
+            }
+            if(!DBmanager.OBs.containsKey(op.getUniqueId())){
+                p.sendMessage(EnforcerSuite.getPrefix()+ " " + op.getName() + " does not have a record");
+                return true;
+            }else{
+                try {
+                    p.sendMessage(EnforcerSuite.getPrefix() + " " +EnforcerSuite.getJSonParser().writeValueAsString(DBmanager.OBs.get(op.getUniqueId())));
+                } catch (IOException ex) {
+                    p.sendMessage(EnforcerSuite.getPrefix()+ " " + "IOException!");
                 }
                 return true;
             }
