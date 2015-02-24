@@ -122,6 +122,7 @@ public class Commands implements CommandExecutor{
                             p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
                         }
                     }else{
+                        DBmanager.OBs.remove(op.getUniqueId());
                         p.sendMessage(EnforcerSuite.getPrefix() + "That player is already OB!");
                     }
                 }else if(args[0].equalsIgnoreCase("ban")){
@@ -130,7 +131,10 @@ public class Commands implements CommandExecutor{
                             Infraction inf = new Infraction(Integer.parseInt(args[2]), /*PermissionsEx.getUser(op.getName()).getPrefix()*/ "none", p, op.getUniqueId(), op.getName());
                             inf.setBan(true);
                             DBmanager.Bans.put(op.getUniqueId(), inf);
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + op.getName());
+                            op.setBanned(true);
+                            if(op.isOnline()){
+                                op.getPlayer().kickPlayer("You have been banned");
+                            }
                             DBmanager.saveBan(op.getUniqueId());
                             p.sendMessage(EnforcerSuite.getPrefix()+"You have Banned "+op.getName());
                             p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this Ban, uuid " + op.getUniqueId().toString());
@@ -179,16 +183,74 @@ public class Commands implements CommandExecutor{
                 op = Bukkit.getOfflinePlayer(args[0]);
             }
             if(!DBmanager.OBs.containsKey(op.getUniqueId())){
-                p.sendMessage(EnforcerSuite.getPrefix()+ " " + op.getName() + " does not have a record");
-                return true;
-            }else{
-                try {
-                    p.sendMessage(EnforcerSuite.getPrefix() + " " +EnforcerSuite.getJSonParser().writeValueAsString(DBmanager.OBs.get(op.getUniqueId())));
-                } catch (IOException ex) {
-                    p.sendMessage(EnforcerSuite.getPrefix()+ " " + "IOException!");
+                if(!DBmanager.loadOB(op.getUniqueId())){
+                    p.sendMessage(EnforcerSuite.getPrefix()+ " " + op.getName() + " does not have a record");
+                    return true;
+                }else{
+                    p.sendMessage(EnforcerSuite.getPrefix() + " " + DBmanager.OBs.get(op.getUniqueId()).toString());
+                    DBmanager.OBs.remove(op.getUniqueId());
+                    return true;
                 }
+            }else{
+                p.sendMessage(EnforcerSuite.getPrefix() + " " + DBmanager.OBs.get(op.getUniqueId()).toString());
                 return true;
             }
+        }else if(cmd.getName().equalsIgnoreCase("pardon") && p.hasPermission("enforcerHelper.punish") && args.length>0){
+            OfflinePlayer op;
+            try{
+                op = Bukkit.getOfflinePlayer(UUID.fromString(args[0]));
+            }catch (Exception e){
+                op = Bukkit.getOfflinePlayer(args[0]);
+            }
+            if(DBmanager.Bans.containsKey(op.getUniqueId())){
+                Infraction ob = DBmanager.OBs.get(p.getUniqueId());
+                ob.setFinished(new Date());
+                ob.setDone(true);
+                ob.getBannedOn().remove("build");
+                DBmanager.archiveBan(op.getUniqueId());
+                op.setBanned(false);
+            }else if(DBmanager.OBs.containsKey(op.getUniqueId())){
+                Infraction ob = DBmanager.OBs.get(p.getUniqueId());
+                if(ob.inDestination(p.getLocation())){
+                    if(ob.getSeverity()>1){
+                        ob.setFinished(new Date());
+                        p.sendMessage(EnforcerSuite.getPrefix() + "You are OB for one more week");
+                        ob.setDone(true);
+                    }else{
+                        p.sendMessage(EnforcerSuite.getPrefix() + "You are no longer OB!");
+                        ob.setFinished(new Date());
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "promote " + p.getName());
+                        ob.setRePromoted(true);
+                        DBmanager.archiveOB(p.getUniqueId());
+                    }
+                }
+            }else{
+                if(DBmanager.loadBan(op.getUniqueId())){
+                    Infraction ob = DBmanager.OBs.get(p.getUniqueId());
+                    ob.setFinished(new Date());
+                    ob.setDone(true);
+                    ob.getBannedOn().remove("build");
+                    DBmanager.archiveBan(op.getUniqueId());
+                    op.setBanned(false);
+                }
+                if(DBmanager.loadOB(op.getUniqueId())){
+                    Infraction ob = DBmanager.OBs.get(p.getUniqueId());
+                    if(ob.inDestination(p.getLocation())){
+                        if(ob.getSeverity()>1){
+                            ob.setFinished(new Date());
+                            p.sendMessage(EnforcerSuite.getPrefix() + "You are OB for one more week");
+                            ob.setDone(true);
+                        }else{
+                            p.sendMessage(EnforcerSuite.getPrefix() + "You are no longer OB!");
+                            ob.setFinished(new Date());
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "promote " + p.getName());
+                            ob.setRePromoted(true);
+                            DBmanager.archiveOB(p.getUniqueId());
+                        }
+                    }
+                }
+            }
+            return true;
         }
         return false;
     }

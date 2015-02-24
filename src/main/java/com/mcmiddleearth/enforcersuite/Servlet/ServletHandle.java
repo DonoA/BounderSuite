@@ -22,6 +22,7 @@ package com.mcmiddleearth.enforcersuite.Servlet;
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import com.mcmiddleearth.enforcersuite.Records.Infraction;
+import com.mcmiddleearth.enforcersuite.Utils.LogUtil;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -29,6 +30,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -85,7 +87,15 @@ public class ServletHandle extends AbstractHandler{
                 response.getWriter().print(EnforcerSuite.getJSonParser().writeValueAsString(ServletDBmanager.getRecord(requestUUID).getCurrentInfraction()) + "\n");
                 response.getWriter().println("Archived:");
                 response.getWriter().print(EnforcerSuite.getJSonParser().writeValueAsString(ServletDBmanager.getRecord(requestUUID).getOldInfractions()) + "\n");
+            }else{
+                baseRequest.setHandled(true);
+                response.setStatus(HttpServletResponse.SC_OK);
+                response.getWriter().println("Use one of the following" + "\n" + "/<current|archive>/<ob|ban>" + "\n" + "/files/<player (uuid or name) >");
             }
+        }else{
+            baseRequest.setHandled(true);
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().println("Use one of the following" + "\n" + "/<current|archive>/<ob|ban>" + "\n" + "/files/<player (uuid or name) >");
         }
     }
     
@@ -98,7 +108,7 @@ public class ServletHandle extends AbstractHandler{
             try {
                 welcomeSocket = new ServerSocket(6789);
                 List<String> rtn = new ArrayList<String>();
-                        
+                ServletDBmanager.loadIncomplete();
                 while(true){
                     try (Socket connectionSocket = welcomeSocket.accept()) {
                         BufferedReader inFromClient =
@@ -107,6 +117,7 @@ public class ServletHandle extends AbstractHandler{
                         clientSentence = inFromClient.readLine();
                         if(clientSentence.equalsIgnoreCase("ping")){
                             rtn.clear();
+                            LogUtil.printDebug(ServletDBmanager.Incomplete);
                             for(Infraction inf : ServletDBmanager.Incomplete){
                                 if(inf.getOBname() == null){
                                     if(inf.isBan()){
@@ -122,8 +133,7 @@ public class ServletHandle extends AbstractHandler{
                                     }
                                 }
                             }
-                            if(EnforcerSuite.isDebug())
-                                Bukkit.getLogger().log(Level.INFO, "{0}Successful Ping", ChatColor.GREEN);
+                            LogUtil.printDebug("Successful Ping");
                             outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtn));
                         }else if(clientSentence.contains("fetch")){
                             for(Infraction inf : ServletDBmanager.Incomplete){
@@ -132,19 +142,21 @@ public class ServletHandle extends AbstractHandler{
                                 }
                             }
                         }else if(clientSentence.contains("return")){ //only works with OBs in the current folder D:
+                            LogUtil.printDebug(clientSentence);
                             clientSentence = clientSentence.substring(clientSentence.indexOf("$")+1);
                             ReturnClass rtnclss = EnforcerSuite.getJSonParser().readValue(clientSentence, ReturnClass.class);
+                            Infraction[] infs = new Infraction[ServletDBmanager.Incomplete.size()];
+                            ServletDBmanager.Incomplete.toArray(infs);
                             Infraction inf = null;
-                            for(Infraction i: ServletDBmanager.Incomplete){
+                            for(Infraction i : infs){
                                 if(clientSentence.contains(i.getOBuuid().toString())){
                                     inf = i;
                                     ServletDBmanager.Incomplete.remove(i);
 //                                    break; idk how dis works
                                 }
                             }
-                            if(inf == null){
+                            if(inf == null)
                                 return;
-                            }
                             //bans
                             if(rtnclss.getBannedOn().isBuild()){
                                 inf.getBannedOn().add("build");
@@ -220,7 +232,7 @@ public class ServletHandle extends AbstractHandler{
                             inf.setNotes(rtnclss.getNotes());
                             DBmanager.OBs.put(UUID.fromString(rtnclss.getObuuid()), inf);
                             DBmanager.saveOB(UUID.fromString(rtnclss.getObuuid()));
-                            if(!Bukkit.getPlayer(UUID.fromString(rtnclss.getObuuid())).isOnline()){
+                            if(!Bukkit.getOfflinePlayer(UUID.fromString(rtnclss.getObuuid())).isOnline()){
                                 DBmanager.OBs.remove(UUID.fromString(rtnclss.getObuuid()));
                             }
                         }else if(clientSentence.contains("request")){
@@ -232,11 +244,13 @@ public class ServletHandle extends AbstractHandler{
                         }
                             
                     } catch (IOException ex) {
-                        Logger.getLogger(ServletHandle.class.getName()).log(Level.SEVERE, null, ex);
+                        LogUtil.printErr("Failed to Decode from forum");
+                        LogUtil.printDebugStack(ex);
                     }
                 }
             } catch (IOException ex) {
-                Logger.getLogger(ServletHandle.class.getName()).log(Level.SEVERE, null, ex);
+                LogUtil.printErr("Failed to Decode from forum");
+                LogUtil.printDebugStack(ex);
             }
             
             

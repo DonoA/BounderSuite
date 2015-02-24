@@ -23,6 +23,7 @@ import com.mcmiddleearth.enforcersuite.Records.Destination;
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import com.mcmiddleearth.enforcersuite.Records.Record;
+import com.mcmiddleearth.enforcersuite.Utils.LogUtil;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -74,6 +75,8 @@ public class DBmanager {
         try {
             EnforcerSuite.getJSonParser().writeValue(saveStart, OBs.get(uuid));
          } catch (IOException ex) {
+             LogUtil.printErr("Failed to save OB");
+             LogUtil.printDebugStack(ex);
              successful = false;
          } finally {
              if (successful) {
@@ -89,7 +92,8 @@ public class DBmanager {
             try {
                 r = EnforcerSuite.getJSonParser().readValue(save, Record.class);
             } catch (IOException ex) {
-                Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+                LogUtil.printErr("Failed to update OB");
+                LogUtil.printDebugStack(ex);
                 return;
             }
         }else{
@@ -107,6 +111,8 @@ public class DBmanager {
         try {
             EnforcerSuite.getJSonParser().writeValue(saveStart, r);
          } catch (IOException ex) {
+             LogUtil.printErr("Failed to save OB");
+             LogUtil.printDebugStack(ex);
              successful = false;
          } finally {
              if (successful) {
@@ -124,7 +130,8 @@ public class DBmanager {
         try {
             DBmanager.OBs.put(uuid, EnforcerSuite.getJSonParser().readValue(save, Infraction.class));
         } catch (IOException ex) {
-            Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+            LogUtil.printErr("Failed to load OB");
+            LogUtil.printDebugStack(ex);
         }
         return true;
     }
@@ -137,7 +144,8 @@ public class DBmanager {
             try {
                 r = EnforcerSuite.getJSonParser().readValue(save, Record.class);
             } catch (IOException ex) {
-                Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+                LogUtil.printErr("Failed to archive OB");
+                LogUtil.printDebugStack(ex);
                 return;
             }
         }else{
@@ -161,6 +169,8 @@ public class DBmanager {
         try {
             EnforcerSuite.getJSonParser().writeValue(saveStart, r);
          } catch (IOException ex) {
+             LogUtil.printErr("Failed to archive OB");
+             LogUtil.printDebugStack(ex);
              successful = false;
          } finally {
              if (successful) {
@@ -180,14 +190,14 @@ public class DBmanager {
             int Bounds[] = new int[] {Integer.parseInt(s.readLine()), Integer.parseInt(s.readLine()), Integer.parseInt(s.readLine()), Integer.parseInt(s.readLine())};
             String name = s.readLine();
             return new Destination(Bounds, name); 
-        }catch(NumberFormatException e){
-            System.out.println("Bad Destination File " + e.toString());
+        }catch(NumberFormatException ex){
+            LogUtil.printErr("Bad Destination File " + ex.toString());
             return null;
         } catch (FileNotFoundException ex) {
-            System.out.println("Bad Destination File " + ex.toString());
+            LogUtil.printErr("Bad Destination File " + ex.toString());
             return null;
         } catch (IOException ex) {
-            System.out.println("Bad Destination File " + ex.toString());
+            LogUtil.printErr("Bad Destination File " + ex.toString());
             return null;
         }
     }
@@ -204,6 +214,8 @@ public class DBmanager {
         try {
             EnforcerSuite.getJSonParser().writeValue(saveStart, OBs.get(uuid));
          } catch (IOException ex) {
+             LogUtil.printErr("Failed to save Ban");
+             LogUtil.printDebugStack(ex);
              successful = false;
          } finally {
              if (successful) {
@@ -219,7 +231,8 @@ public class DBmanager {
             try {
                 r = EnforcerSuite.getJSonParser().readValue(save, Record.class);
             } catch (IOException ex) {
-                Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+                LogUtil.printErr("Failed to save Ban");
+                LogUtil.printDebugStack(ex);
                 return;
             }
         }else{
@@ -237,6 +250,8 @@ public class DBmanager {
         try {
             EnforcerSuite.getJSonParser().writeValue(saveStart, r);
          } catch (IOException ex) {
+             LogUtil.printErr("Failed to save Ban");
+             LogUtil.printDebugStack(ex);
              successful = false;
          } finally {
              if (successful) {
@@ -255,7 +270,8 @@ public class DBmanager {
             try {
                 r = EnforcerSuite.getJSonParser().readValue(save, Record.class);
             } catch (IOException ex) {
-                Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+                LogUtil.printErr("Failed to archive Ban");
+                LogUtil.printDebugStack(ex);
                 return;
             }
         }else{
@@ -279,6 +295,8 @@ public class DBmanager {
         try {
             EnforcerSuite.getJSonParser().writeValue(saveStart, r);
          } catch (IOException ex) {
+             LogUtil.printErr("Failed to archive Ban");
+             LogUtil.printDebugStack(ex);
              successful = false;
          } finally {
              if (successful) {
@@ -297,7 +315,8 @@ public class DBmanager {
         try {
             DBmanager.Bans.put(uuid, EnforcerSuite.getJSonParser().readValue(save, Infraction.class));
         } catch (IOException ex) {
-            Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+            LogUtil.printErr("Failed to load ban");
+            LogUtil.printDebugStack(ex);
         }
         return true;
     }

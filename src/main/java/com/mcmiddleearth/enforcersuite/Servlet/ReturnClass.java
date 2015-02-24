@@ -18,6 +18,10 @@
  */
 package com.mcmiddleearth.enforcersuite.Servlet;
 
+import com.mcmiddleearth.enforcersuite.EnforcerSuite;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -61,6 +65,16 @@ public class ReturnClass {
         private String othertxt;
         
         public bannedOn(){}
+        
+        @Override
+        public String toString(){
+            try {
+                return EnforcerSuite.getJSonParser().writeValueAsString(this);
+            } catch (IOException ex) {
+                Logger.getLogger(ReturnClass.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return "error";
+        }
     }
     
     public class reasons {

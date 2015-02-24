@@ -20,9 +20,14 @@
 package com.mcmiddleearth.enforcersuite.Records;
 
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
+import com.mcmiddleearth.enforcersuite.EnforcerSuite;
+import com.mcmiddleearth.enforcersuite.Utils.LogUtil;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -112,5 +117,16 @@ public class Infraction {
         }else{
             return false;
         }
+    }
+    
+    @Override
+    public String toString(){
+        try {
+            return EnforcerSuite.getJSonParser().writeValueAsString(this);
+        } catch (IOException ex) {
+            LogUtil.printErr("Failed to convert Infraction");
+             LogUtil.printDebugStack(ex);
+        }
+        return "error";
     }
 }
