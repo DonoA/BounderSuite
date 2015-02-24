@@ -19,6 +19,7 @@
 
 package com.mcmiddleearth.enforcersuite.Servlet;
 
+import com.mcmiddleearth.enforcersuite.Utils.LogUtil;
 import lombok.Getter;
 import org.eclipse.jetty.server.Server;
 
@@ -46,8 +47,9 @@ public class Servlet {
                 (new ServletHandle.TCPconnect()).start();
 //                server.join();
             }
-        } catch (Exception e) {
-            System.err.printf("Failed to start servlet on port: " + BoundPort + " : " + e.getMessage());
+        } catch (Exception ex) {
+            LogUtil.printErr("Failed to start servlet on port: " + BoundPort);
+             LogUtil.printDebugStack(ex);
         }
     }
 }

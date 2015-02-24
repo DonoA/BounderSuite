@@ -22,9 +22,11 @@ package com.mcmiddleearth.enforcersuite;
 import com.mcmiddleearth.enforcersuite.Listeners.LoginListen;
 import com.mcmiddleearth.enforcersuite.Commands.Commands;
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
+import com.mcmiddleearth.enforcersuite.Listeners.SaveListen;
 import com.mcmiddleearth.enforcersuite.Servlet.Servlet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.mcmiddleearth.enforcersuite.Servlet.ServletDBmanager;
+import com.mcmiddleearth.enforcersuite.Utils.LogUtil;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -33,7 +35,8 @@ import org.bukkit.World;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.codehaus.jackson.map.ObjectMapper;
-import ru.tehkode.permissions.PermissionManager;
+import ru.tehkode.permissions.PermissionManager; //screw this API!!!
+
 //Oathbreaker, Thrall, Commoner, Ranger, Artist, Foreman, Artisan, Steward, Enforcer, Valar
 /**
  *
@@ -44,10 +47,10 @@ public class EnforcerSuite extends JavaPlugin{
     private static EnforcerSuite plugin;
     
     @Getter
-    private static String prefix = ChatColor.GOLD +"["+ ChatColor.YELLOW +"EnforcerSuite"+ ChatColor.GOLD +"] "+ ChatColor.YELLOW;
+    private final static String prefix = ChatColor.GOLD +"["+ ChatColor.YELLOW +"EnforcerSuite"+ ChatColor.GOLD +"] "+ ChatColor.YELLOW;
     
     @Getter
-    private String FileSep = System.getProperty("file.separator");
+    private final String FileSep = System.getProperty("file.separator");
     
     @Getter @Setter
     private World MainWorld;
@@ -71,8 +74,10 @@ public class EnforcerSuite extends JavaPlugin{
         Debug = this.getConfig().getBoolean("debug");
         PluginManager pm = this.getServer().getPluginManager();
         pm.registerEvents(new LoginListen(), this);
+        pm.registerEvents(new SaveListen(), this);
         getCommand("punish").setExecutor(new Commands());
         getCommand("done").setExecutor(new Commands());
+        getCommand("getinfo").setExecutor(new Commands());
         MainWorld = Bukkit.getWorld(this.getConfig().getString("MainWorld"));
         servlet = new Servlet(port);
         servlet.start();
@@ -82,7 +87,16 @@ public class EnforcerSuite extends JavaPlugin{
         try {
             servlet.getServer().stop();
         } catch (Exception ex) {
-            Logger.getLogger(EnforcerSuite.class.getName()).log(Level.SEVERE, null, ex);
+            LogUtil.printErr("Failed to stop EnforcerSuite");
+            LogUtil.printDebugStack(ex);
+        }finally{
+            for(UUID uuid : DBmanager.Bans.keySet()){
+                DBmanager.saveBan(uuid);
+            }
+            for(UUID uuid : DBmanager.OBs.keySet()){
+                DBmanager.saveOB(uuid);
+            }
+            ServletDBmanager.saveIncomplete();
         }
     }
 }

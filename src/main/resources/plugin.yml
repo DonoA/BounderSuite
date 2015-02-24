@@ -9,9 +9,17 @@ commands:
   punish:
     description: OathBreaker a player
     usage: |
-            /punish <player> <severity>
+            /punish <ob|ban> <player> <severity>
   done:
     description: finish your OB
     usage: |
             /done
+  getinfo:
+    description: Get info on a player
+    usage: |
+            /getinfo
+  pardon:
+    description: pardon a player from their sins
+    usage: |
+            /pardon <player>
     

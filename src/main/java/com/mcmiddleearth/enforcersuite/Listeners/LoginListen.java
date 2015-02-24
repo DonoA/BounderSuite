@@ -22,6 +22,7 @@ package com.mcmiddleearth.enforcersuite.Listeners;
 import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
+import com.mcmiddleearth.enforcersuite.Utils.LogUtil;
 import java.util.Date;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -58,6 +59,8 @@ public class LoginListen implements Listener{
             if(!curr.isDone()){
                 p.sendMessage(ChatColor.YELLOW + "Your Location is " + ChatColor.RED + curr.getDestination().getName());
             }
+            LogUtil.printDebug(curr.getSeverity());
+            LogUtil.printDebug(curr.toString());
         }
     }
     @EventHandler
@@ -66,6 +69,10 @@ public class LoginListen implements Listener{
         if(DBmanager.OBs.containsKey(p.getUniqueId())){
             DBmanager.saveOB(p.getUniqueId());
             DBmanager.OBs.remove(p.getUniqueId());
+        }
+        if(DBmanager.Bans.containsKey(p.getUniqueId())){
+            DBmanager.saveBan(p.getUniqueId());
+            DBmanager.Bans.remove(p.getUniqueId());
         }
     }
 }

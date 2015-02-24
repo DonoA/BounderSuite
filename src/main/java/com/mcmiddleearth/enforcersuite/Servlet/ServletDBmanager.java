@@ -23,9 +23,11 @@ import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import com.mcmiddleearth.enforcersuite.Records.Record;
+import com.mcmiddleearth.enforcersuite.Utils.LogUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -37,7 +39,7 @@ import java.util.logging.Logger;
  */
 public class ServletDBmanager {
     
-    private static File DB = new File(EnforcerSuite.getPlugin().getDataFolder() + System.getProperty("file.separator") + "OB-DB");
+    private static File DB = new File(EnforcerSuite.getPlugin().getDataFolder() + System.getProperty("file.separator") + "Infraction-DB");
     
     public static List<Infraction> Incomplete = new ArrayList<>();
     
@@ -47,7 +49,8 @@ public class ServletDBmanager {
             try {
                 return EnforcerSuite.getJSonParser().readValue(save, Record.class);
             } catch (IOException ex) {
-                Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+                LogUtil.printErr("Failed to load Record");
+                LogUtil.printDebugStack(ex);
             }
         }
         Record r = new Record();
@@ -61,7 +64,8 @@ public class ServletDBmanager {
         try {
             return EnforcerSuite.getJSonParser().readValue(save, Infraction.class);
         } catch (IOException ex) {
-            Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+            LogUtil.printErr("Failed to load OB");
+                LogUtil.printDebugStack(ex);
             return new Infraction();
         }
     }
@@ -72,7 +76,8 @@ public class ServletDBmanager {
         try {
             return EnforcerSuite.getJSonParser().readValue(save, Infraction.class);
         } catch (IOException ex) {
-            Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+            LogUtil.printErr("Failed to load Ban");
+                LogUtil.printDebugStack(ex);
             return new Infraction();
         }
     }
@@ -156,5 +161,42 @@ public class ServletDBmanager {
             }
         }
         return rtn;
+    }
+    
+    public static void saveIncomplete(){
+        File saveStart = new File(DB + System.getProperty("file.separator") + "Servlet.new.data");
+        File saveFin = new File(DB + System.getProperty("file.separator") + "Servlet.data");
+        if(saveFin.exists()&&saveStart.exists()){
+            saveFin.delete();
+            saveFin.renameTo(saveFin);
+        }
+        boolean successful = true;
+        try {
+            EnforcerSuite.getJSonParser().writeValue(saveStart, Incomplete.toArray());
+         } catch (IOException ex) {
+             successful = false;
+         } finally {
+             if (successful) {
+                 if (saveFin.exists()) {
+                     saveFin.delete();
+                 }
+                 saveStart.renameTo(saveFin);
+             }
+         }
+    }
+    
+    public static boolean loadIncomplete(){
+        File save = new File(DB + System.getProperty("file.separator") + "Servlet.data");
+        if(!save.exists()){
+            LogUtil.printDebug(save);
+            return false;
+        }
+        try {
+            ServletDBmanager.Incomplete.clear();
+            ServletDBmanager.Incomplete.addAll(Arrays.asList(EnforcerSuite.getJSonParser().readValue(save, Infraction[].class)));
+        } catch (IOException ex) {
+            Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return true;
     }
 }
