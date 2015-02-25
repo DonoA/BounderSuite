@@ -20,10 +20,7 @@
 package com.mcmiddleearth.enforcersuite.Records;
 
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
-import com.mcmiddleearth.enforcersuite.Records.Infraction;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
