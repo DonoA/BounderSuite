@@ -42,6 +42,10 @@ public class LoginListen implements Listener{
         Player p = e.getPlayer();
         if(DBmanager.loadOB(p.getUniqueId())){//if they are ob
             Infraction curr = DBmanager.OBs.get(p.getUniqueId());
+            if(curr.getOBname() != null){
+                DBmanager.addName(p.getUniqueId(), curr.getOBname());
+            }
+            DBmanager.addName(p.getUniqueId(), p.getName());
             curr.setOBname(p.getName());
             if(!curr.isStarted()){
                 p.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());

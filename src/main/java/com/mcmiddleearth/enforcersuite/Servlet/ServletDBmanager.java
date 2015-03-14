@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -44,7 +45,7 @@ public class ServletDBmanager {
     public static List<Infraction> Incomplete = new ArrayList<>();
     
     public static Record getRecord(UUID ob){
-        File save = new File(DB + System.getProperty("file.separator") + "Archive" + System.getProperty("file.separator") + ob.toString() + ".record");
+        File save = new File(DB + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + ob.toString() + ".record");
         if(save.exists()){
             try {
                 return EnforcerSuite.getJSonParser().readValue(save, Record.class);
@@ -96,7 +97,7 @@ public class ServletDBmanager {
                 } catch (IOException ex) {}
             }
         }else{
-            for(File f : new File(DB + System.getProperty("file.separator") + "Archive").listFiles()){
+            for(File f : new File(DB + System.getProperty("file.separator") + "Records").listFiles()){
                 try {
                     Record rcrd = EnforcerSuite.getJSonParser().readValue(f, Record.class);
                     boolean isBan = false;
@@ -128,15 +129,19 @@ public class ServletDBmanager {
             for(File f : new File(DB + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + "Ban").listFiles()){
                 try {
                     Infraction inf = EnforcerSuite.getJSonParser().readValue(f, Infraction.class);
+                    LogUtil.printDebug(f);
                     if(inf.getOBname() != null){
                         rtn.add(f.getName().replace(".obdat", "") + " - " + inf.getOBname());
                     }else{
                         rtn.add(f.getName().replace(".obdat", ""));
                     }
-                } catch (IOException ex) {}
+                } catch (IOException ex) {
+                    LogUtil.printDebug("Error loading inf");
+                    LogUtil.printDebugStack(ex);
+                }
             }
         }else{
-            for(File f : new File(DB + System.getProperty("file.separator") + "Archive").listFiles()){
+            for(File f : new File(DB + System.getProperty("file.separator") + "Records").listFiles()){
                 try {
                     
                     Record rcrd = EnforcerSuite.getJSonParser().readValue(f, Record.class);
@@ -151,7 +156,7 @@ public class ServletDBmanager {
                         for(Infraction inf : rcrd.getOldInfractions().values()){
                             if(inf.getOBname() != null){
                                 if(!s.contains(inf.getOBname())){
-                                    s += inf.getOBname() + "  ";
+                                    s += inf.getOBname();
                                 }
                             }
                         }
@@ -198,5 +203,18 @@ public class ServletDBmanager {
             Logger.getLogger(DBmanager.class.getName()).log(Level.SEVERE, null, ex);
         }
         return true;
+    }
+    
+    public ArrayList<Record> getArchives(){
+        ArrayList<Record> rtn = new ArrayList<Record>();
+        File main = new File(DB + System.getProperty("file.separator") + "Records");
+        for(File f : main.listFiles()){
+            try {
+                rtn.add(EnforcerSuite.getJSonParser().readValue(f, Record.class));
+            } catch (IOException ex) {
+                Logger.getLogger(ServletDBmanager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return rtn;
     }
 }

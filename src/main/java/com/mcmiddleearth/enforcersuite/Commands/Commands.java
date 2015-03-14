@@ -23,6 +23,7 @@ import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import com.mcmiddleearth.enforcersuite.Servlet.ServletDBmanager;
+import com.mcmiddleearth.enforcersuite.Utils.LogUtil;
 import java.util.Date;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -55,10 +56,12 @@ public class Commands implements CommandExecutor{
                 return false;
             }
             OfflinePlayer op;
+            String opName = "nill";
             try{
                 op = Bukkit.getOfflinePlayer(UUID.fromString(args[1]));
             }catch (Exception e){
                 op = Bukkit.getOfflinePlayer(args[1]);
+                opName = args[1];
             }
             if(op.isOnline()){
                 Player ob = op.getPlayer();
@@ -127,6 +130,7 @@ public class Commands implements CommandExecutor{
                         if(op.hasPlayedBefore()){
                             Infraction inf = new Infraction(Integer.parseInt(args[2]), /*PermissionsEx.getUser(op.getName()).getPrefix()*/ "none", p, op.getUniqueId(), op.getName());
                             inf.setBan(true);
+                            LogUtil.printDebug(inf.toString());
                             DBmanager.Bans.put(op.getUniqueId(), inf);
                             op.setBanned(true);
                             if(op.isOnline()){
@@ -145,7 +149,7 @@ public class Commands implements CommandExecutor{
                 }else{
                     return false;
                 }
-        }
+            }
             //When the OB isn't online there file will be loaded on start
             return true;
         }else if(cmd.getName().equalsIgnoreCase("done")){

@@ -103,7 +103,7 @@ public class ServletHandle extends AbstractHandler{
             ServerSocket welcomeSocket = null;
             try {
                 welcomeSocket = new ServerSocket(6789);
-                List<String> rtn = new ArrayList<String>();
+                List<String> rtn = new ArrayList<>();
                 ServletDBmanager.loadIncomplete();
                 while(true){
                     try (Socket connectionSocket = welcomeSocket.accept()) {
@@ -132,9 +132,28 @@ public class ServletHandle extends AbstractHandler{
                             LogUtil.printDebug("Successful Ping");
                             outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtn));
                         }else if(clientSentence.contains("fetch")){
-                            for(Infraction inf : ServletDBmanager.Incomplete){
-                                if(clientSentence.contains(inf.getOBuuid().toString())){
-                                    outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(inf));
+                            if(clientSentence.contains("archive")){
+                                ArrayList<String> toSend = new ArrayList<>();
+                                toSend.add("<b>OBs:</b><hr>");
+                                toSend.add("<i>Current:</i>");
+                                toSend.addAll(ServletDBmanager.getOBs(true));
+                                toSend.add("<i>Archived:</i>");
+                                List<String> hold = ServletDBmanager.getOBs(false);
+                                hold.removeAll(ServletDBmanager.getOBs(true));
+                                toSend.addAll(hold);
+                                toSend.add("<b>Bans:</b><hr>");
+                                toSend.add("<i>Current:</i>");
+                                toSend.addAll(ServletDBmanager.getBans(true));
+                                toSend.add("<i>Archived:</i>");
+                                hold = ServletDBmanager.getBans(false);
+                                hold.removeAll(ServletDBmanager.getBans(true));
+                                toSend.addAll(hold);
+                                outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(toSend));
+                            }else{
+                                for(Infraction inf : ServletDBmanager.Incomplete){
+                                    if(clientSentence.contains(inf.getOBuuid().toString())){
+                                        outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(inf));
+                                    }
                                 }
                             }
                         }else if(clientSentence.contains("return")){ //only works with OBs in the current folder D:

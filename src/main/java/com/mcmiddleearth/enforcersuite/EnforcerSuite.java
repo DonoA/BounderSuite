@@ -25,6 +25,7 @@ import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import com.mcmiddleearth.enforcersuite.Listeners.SaveListen;
 import com.mcmiddleearth.enforcersuite.Servlet.Servlet;
 import com.mcmiddleearth.enforcersuite.Servlet.ServletDBmanager;
+import com.mcmiddleearth.enforcersuite.Servlet.ServletHandle;
 import com.mcmiddleearth.enforcersuite.Utils.LogUtil;
 import java.util.UUID;
 import lombok.Getter;
@@ -68,7 +69,6 @@ public class EnforcerSuite extends JavaPlugin{
     public void onEnable(){
         this.saveDefaultConfig();
         this.reloadConfig();
-        int port = this.getConfig().getInt("port");
         JSonParser = new ObjectMapper();
         plugin = this;
         Debug = this.getConfig().getBoolean("debug");
@@ -78,9 +78,14 @@ public class EnforcerSuite extends JavaPlugin{
         getCommand("punish").setExecutor(new Commands());
         getCommand("done").setExecutor(new Commands());
         getCommand("getinfo").setExecutor(new Commands());
+        getCommand("pardon").setExecutor(new Commands());
         MainWorld = Bukkit.getWorld(this.getConfig().getString("MainWorld"));
-        servlet = new Servlet(port);
-        servlet.start();
+        if(this.getConfig().getBoolean("useServlet")){
+            int port = this.getConfig().getInt("port");
+            servlet = new Servlet(port);
+            servlet.start();
+        }
+        (new ServletHandle.TCPconnect()).start();
     }
     @Override
     public void onDisable(){
