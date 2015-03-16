@@ -46,112 +46,126 @@ public class Commands implements CommandExecutor{
         //punish <ob|ban> <name|uuid> <1 | 2> [convo]
         // cmd   args[0]    args[1]   args[2] args[3]
         
-        if(p.hasPermission("enforcerHelper.punish")&&args.length>1&&cmd.getName().equalsIgnoreCase("punish")){
-            if(args.length < 3){
+        //ob <name|uuid> <1|2> [convo]
+        //ban <name|uuid> <1|2> [convo]
+        
+        if(p.hasPermission("enforcerHelper.punish")&&args.length>1&&cmd.getName().equalsIgnoreCase("ob")){
+            if(args.length < 2){
                 return false;
             }
             try{ // check that arg 1 is and int
-                Integer.parseInt(args[2]);
+                Integer.parseInt(args[1]);
             }catch (NumberFormatException e){
                 return false;
             }
             OfflinePlayer op;
             String opName = "nill";
             try{
-                op = Bukkit.getOfflinePlayer(UUID.fromString(args[1]));
+                op = Bukkit.getOfflinePlayer(UUID.fromString(args[0]));
             }catch (Exception e){
-                op = Bukkit.getOfflinePlayer(args[1]);
-                opName = args[1];
+                op = Bukkit.getOfflinePlayer(args[0]);
+                opName = args[0];
             }
             if(op.isOnline()){
                 Player ob = op.getPlayer();
-                if(args[0].equalsIgnoreCase("ob")){
-                    if(!DBmanager.OBs.containsKey(ob.getUniqueId())){
-                        ob.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
-                        Infraction inf = new Infraction(Integer.parseInt(args[2]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, ob.getUniqueId(), ob.getName());
-                        inf.setStarted(true);
-                        DBmanager.OBs.put(ob.getUniqueId(), inf);
-                        for(int j=0; j <= 3; j++){
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + ob.getName());
-                        }
-                        DBmanager.saveOB(ob.getUniqueId()); //save OB to file
+                if(!DBmanager.OBs.containsKey(ob.getUniqueId())){
+                    ob.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
+                    Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, ob.getUniqueId(), ob.getName());
+                    inf.setStarted(true);
+                    DBmanager.OBs.put(ob.getUniqueId(), inf);
+                    for(int j=0; j <= 3; j++){
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + ob.getName());
+                    }
+                    DBmanager.saveOB(ob.getUniqueId()); //save OB to file
 
-                        p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+ob.getName());
-                        p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + ob.getUniqueId().toString());
-                        ServletDBmanager.Incomplete.add(inf);
-                        ob.sendMessage(EnforcerSuite.getPrefix()+"You are an OathBreaker now");
-                        ob.sendMessage(EnforcerSuite.getPrefix()+"Your destination is " + ChatColor.RED + inf.getDestination().getName());
-                    }else{
-                        p.sendMessage(EnforcerSuite.getPrefix()+ob.getName() + " is already OB!");
-                    }
-                }else if(args[0].equalsIgnoreCase("ban")){
-                    if(!ob.isBanned()){
-                        if(op.hasPlayedBefore()){
-                            Infraction inf = new Infraction(Integer.parseInt(args[2]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, ob.getUniqueId(), ob.getName());
-                            inf.setBan(true);
-                            DBmanager.Bans.put(op.getUniqueId(), inf);
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + op.getName());
-                            DBmanager.saveBan(op.getUniqueId());
-                            p.sendMessage(EnforcerSuite.getPrefix()+"You have Banned "+ob.getName());
-                            p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this Ban, uuid " + ob.getUniqueId().toString());
-                            ServletDBmanager.Incomplete.add(inf);
-                        }else{
-                            p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
-                        }
-                    }else{
-                        p.sendMessage(EnforcerSuite.getPrefix()+ob.getName() + " is already Banned!");
-                    }
+                    p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+ob.getName());
+                    p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + ob.getUniqueId().toString());
+                    ServletDBmanager.Incomplete.add(inf);
+                    ob.sendMessage(EnforcerSuite.getPrefix()+"You are an OathBreaker now");
+                    ob.sendMessage(EnforcerSuite.getPrefix()+"Your destination is " + ChatColor.RED + inf.getDestination().getName());
                 }else{
-                    return false;
+                    p.sendMessage(EnforcerSuite.getPrefix()+ob.getName() + " is already OB!");
                 }
             }else{
-                if(args[0].equalsIgnoreCase("ob")){
-                    if(!DBmanager.loadOB(op.getUniqueId())){
-                        if(op.hasPlayedBefore()){
-                            Infraction inf = new Infraction(Integer.parseInt(args[2]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, op.getUniqueId());
-                            DBmanager.OBs.put(op.getUniqueId(), inf);
-                            for(int j=0; j <= 3; j++){
-                                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + op.getName());
-                            }
-                            DBmanager.saveOB(op.getUniqueId());
-                            DBmanager.OBs.remove(op.getUniqueId());
-                            p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+op.getName());
-                            p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + op.getUniqueId().toString());
-                            ServletDBmanager.Incomplete.add(inf);
-                        }else{
-                            p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
+                if(!DBmanager.loadOB(op.getUniqueId())){
+                    if(op.hasPlayedBefore()){
+                        Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, op.getUniqueId());
+                        DBmanager.OBs.put(op.getUniqueId(), inf);
+                        for(int j=0; j <= 3; j++){
+                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + op.getName());
                         }
-                    }else{
+                        DBmanager.saveOB(op.getUniqueId());
                         DBmanager.OBs.remove(op.getUniqueId());
-                        p.sendMessage(EnforcerSuite.getPrefix() + "That player is already OB!");
-                    }
-                }else if(args[0].equalsIgnoreCase("ban")){
-                    if(!op.isBanned()){
-                        if(op.hasPlayedBefore()){
-                            Infraction inf = new Infraction(Integer.parseInt(args[2]), /*PermissionsEx.getUser(op.getName()).getPrefix()*/ "none", p, op.getUniqueId(), op.getName());
-                            inf.setBan(true);
-                            LogUtil.printDebug(inf.toString());
-                            DBmanager.Bans.put(op.getUniqueId(), inf);
-                            op.setBanned(true);
-                            if(op.isOnline()){
-                                op.getPlayer().kickPlayer("You have been banned");
-                            }
-                            DBmanager.saveBan(op.getUniqueId());
-                            p.sendMessage(EnforcerSuite.getPrefix()+"You have Banned "+op.getName());
-                            p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this Ban, uuid " + op.getUniqueId().toString());
-                            ServletDBmanager.Incomplete.add(inf);
-                        }else{
-                            p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
-                        }
+                        p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+op.getName());
+                        p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + op.getUniqueId().toString());
+                        ServletDBmanager.Incomplete.add(inf);
                     }else{
-                        p.sendMessage(EnforcerSuite.getPrefix()+op.getName() + " is already Banned!");
+                        p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
                     }
                 }else{
-                    return false;
+                    DBmanager.OBs.remove(op.getUniqueId());
+                    p.sendMessage(EnforcerSuite.getPrefix() + "That player is already OB!");
                 }
             }
             //When the OB isn't online there file will be loaded on start
             return true;
+        }else if(p.hasPermission("enforcerHelper.punish")&&args.length>1&&cmd.getName().equalsIgnoreCase("ban")){
+            if(args.length < 2){
+                return false;
+            }
+            try{ // check that arg 1 is and int
+                Integer.parseInt(args[1]);
+            }catch (NumberFormatException e){
+                return false;
+            }
+            OfflinePlayer op;
+            String opName = "nill";
+            try{
+                op = Bukkit.getOfflinePlayer(UUID.fromString(args[0]));
+            }catch (Exception e){
+                op = Bukkit.getOfflinePlayer(args[0]);
+                opName = args[0];
+            }
+            if(op.isOnline()){
+                Player ob = op.getPlayer();
+                if(!ob.isBanned()){
+                    if(op.hasPlayedBefore()){
+                        Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, ob.getUniqueId(), ob.getName());
+                        inf.setBan(true);
+                        DBmanager.Bans.put(op.getUniqueId(), inf);
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "ban " + op.getName());
+                        DBmanager.saveBan(op.getUniqueId());
+                        p.sendMessage(EnforcerSuite.getPrefix()+"You have Banned "+ob.getName());
+                        p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this Ban, uuid " + ob.getUniqueId().toString());
+                        ServletDBmanager.Incomplete.add(inf);
+                    }else{
+                        p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
+                    }
+                }else{
+                    p.sendMessage(EnforcerSuite.getPrefix()+ob.getName() + " is already Banned!");
+                }
+            }else{
+                if(!op.isBanned()){
+                    if(op.hasPlayedBefore()){
+                        Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(op.getName()).getPrefix()*/ "none", p, op.getUniqueId(), op.getName());
+                        inf.setBan(true);
+                        LogUtil.printDebug(inf.toString());
+                        DBmanager.Bans.put(op.getUniqueId(), inf);
+                        op.setBanned(true);
+                        if(op.isOnline()){
+                            op.getPlayer().kickPlayer("You have been banned");
+                        }
+                        DBmanager.saveBan(op.getUniqueId());
+                        p.sendMessage(EnforcerSuite.getPrefix()+"You have Banned "+op.getName());
+                        p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this Ban, uuid " + op.getUniqueId().toString());
+                        ServletDBmanager.Incomplete.add(inf);
+                    }else{
+                        p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
+                    }
+                }else{
+                    p.sendMessage(EnforcerSuite.getPrefix()+op.getName() + " is already Banned!");
+                }
+            }
         }else if(cmd.getName().equalsIgnoreCase("done")){
             if(!DBmanager.OBs.containsKey(p.getUniqueId())){
                 p.sendMessage(EnforcerSuite.getPrefix()+"You are not OB!");

@@ -6,10 +6,14 @@ description: makes OBing a player easier
 author: DonoA
 authors: [DonoA, aaldim]
 commands:
-  punish:
+  ob:
     description: OathBreaker a player
     usage: |
-            /punish <ob|ban> <player> <severity>
+            /ob <player name | UUID> <severity 1 | 2>
+  ban:
+    description: OathBreaker a player
+    usage: |
+            /ban <player name | UUID> <severity 1 | 2>
   done:
     description: finish your OB
     usage: |

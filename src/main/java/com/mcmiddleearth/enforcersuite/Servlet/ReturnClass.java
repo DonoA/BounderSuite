@@ -46,6 +46,9 @@ public class ReturnClass {
     @Getter @Setter
     private String notes;
     
+    @Getter @Setter
+    private boolean done;
+    
     public ReturnClass(){}
             
     public class bannedOn {

@@ -75,7 +75,8 @@ public class EnforcerSuite extends JavaPlugin{
         PluginManager pm = this.getServer().getPluginManager();
         pm.registerEvents(new LoginListen(), this);
         pm.registerEvents(new SaveListen(), this);
-        getCommand("punish").setExecutor(new Commands());
+        getCommand("ob").setExecutor(new Commands());
+        getCommand("ban").setExecutor(new Commands());
         getCommand("done").setExecutor(new Commands());
         getCommand("getinfo").setExecutor(new Commands());
         getCommand("pardon").setExecutor(new Commands());

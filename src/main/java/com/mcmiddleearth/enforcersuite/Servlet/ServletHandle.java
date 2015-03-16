@@ -123,9 +123,9 @@ public class ServletHandle extends AbstractHandler{
                                     }
                                 }else{
                                     if(inf.isBan()){
-                                        rtn.add(inf.getOBname() + " - " + inf.getOBuuid().toString() + " - Ban");
+                                        rtn.add(inf.getOBuuid().toString() + " - " + inf.getOBname() + " - " + "Ban");
                                     }else{
-                                        rtn.add(inf.getOBname() + " - " + inf.getOBuuid().toString() + " - OathBreaker");
+                                        rtn.add(inf.getOBuuid().toString() + " - " + inf.getOBname() + " - " + "OathBreaker");
                                     }
                                 }
                             }
@@ -149,6 +149,12 @@ public class ServletHandle extends AbstractHandler{
                                 hold.removeAll(ServletDBmanager.getBans(true));
                                 toSend.addAll(hold);
                                 outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(toSend));
+                            }else if(clientSentence.contains("record")){
+                                LogUtil.printDebug(clientSentence);
+                                int start = clientSentence.indexOf("$");
+                                String uuid = clientSentence.substring(start + 1, clientSentence.indexOf(" ", start));
+                                LogUtil.printDebug(uuid);
+                                outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(ServletDBmanager.getRecord(UUID.fromString(uuid)).getOldInfractions()));
                             }else{
                                 for(Infraction inf : ServletDBmanager.Incomplete){
                                     if(clientSentence.contains(inf.getOBuuid().toString())){
@@ -166,8 +172,9 @@ public class ServletHandle extends AbstractHandler{
                             for(Infraction i : infs){
                                 if(clientSentence.contains(i.getOBuuid().toString())){
                                     inf = i;
-                                    ServletDBmanager.Incomplete.remove(i);
-//                                    break; idk how dis works
+                                    if(rtnclss.isDone()){
+                                        ServletDBmanager.Incomplete.remove(i);
+                                    }
                                 }
                             }
                             if(inf == null)
