@@ -44,7 +44,6 @@ public class Servlet {
         try{
             if(server != null){
                 server.start();
-                (new ServletHandle.TCPconnect()).start();
 //                server.join();
             }
         } catch (Exception ex) {

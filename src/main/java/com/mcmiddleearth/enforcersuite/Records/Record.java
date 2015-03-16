@@ -20,7 +20,6 @@
 package com.mcmiddleearth.enforcersuite.Records;
 
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
-import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,8 +41,8 @@ public class Record {
     @Getter @Setter
     private Infraction CurrentInfraction;
     
-//    @Getter @Setter
-//    private List<String> Names = new ArrayList<>();
+    @Getter @Setter
+    private List<String> Names = new ArrayList<>();
     
     public Record(){}
     

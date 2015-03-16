@@ -30,18 +30,14 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 /**
@@ -107,7 +103,7 @@ public class ServletHandle extends AbstractHandler{
             ServerSocket welcomeSocket = null;
             try {
                 welcomeSocket = new ServerSocket(6789);
-                List<String> rtn = new ArrayList<String>();
+                List<String> rtn = new ArrayList<>();
                 ServletDBmanager.loadIncomplete();
                 while(true){
                     try (Socket connectionSocket = welcomeSocket.accept()) {
@@ -127,18 +123,43 @@ public class ServletHandle extends AbstractHandler{
                                     }
                                 }else{
                                     if(inf.isBan()){
-                                        rtn.add(inf.getOBname() + " - " + inf.getOBuuid().toString() + " - Ban");
+                                        rtn.add(inf.getOBuuid().toString() + " - " + inf.getOBname() + " - " + "Ban");
                                     }else{
-                                        rtn.add(inf.getOBname() + " - " + inf.getOBuuid().toString() + " - OathBreaker");
+                                        rtn.add(inf.getOBuuid().toString() + " - " + inf.getOBname() + " - " + "OathBreaker");
                                     }
                                 }
                             }
                             LogUtil.printDebug("Successful Ping");
                             outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtn));
                         }else if(clientSentence.contains("fetch")){
-                            for(Infraction inf : ServletDBmanager.Incomplete){
-                                if(clientSentence.contains(inf.getOBuuid().toString())){
-                                    outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(inf));
+                            if(clientSentence.contains("archive")){
+                                ArrayList<String> toSend = new ArrayList<>();
+                                toSend.add("<b>OBs:</b><hr>");
+                                toSend.add("<i>Current:</i>");
+                                toSend.addAll(ServletDBmanager.getOBs(true));
+                                toSend.add("<i>Archived:</i>");
+                                List<String> hold = ServletDBmanager.getOBs(false);
+                                hold.removeAll(ServletDBmanager.getOBs(true));
+                                toSend.addAll(hold);
+                                toSend.add("<b>Bans:</b><hr>");
+                                toSend.add("<i>Current:</i>");
+                                toSend.addAll(ServletDBmanager.getBans(true));
+                                toSend.add("<i>Archived:</i>");
+                                hold = ServletDBmanager.getBans(false);
+                                hold.removeAll(ServletDBmanager.getBans(true));
+                                toSend.addAll(hold);
+                                outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(toSend));
+                            }else if(clientSentence.contains("record")){
+                                LogUtil.printDebug(clientSentence);
+                                int start = clientSentence.indexOf("$");
+                                String uuid = clientSentence.substring(start + 1, clientSentence.indexOf(" ", start));
+                                LogUtil.printDebug(uuid);
+                                outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(ServletDBmanager.getRecord(UUID.fromString(uuid)).getOldInfractions()));
+                            }else{
+                                for(Infraction inf : ServletDBmanager.Incomplete){
+                                    if(clientSentence.contains(inf.getOBuuid().toString())){
+                                        outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(inf));
+                                    }
                                 }
                             }
                         }else if(clientSentence.contains("return")){ //only works with OBs in the current folder D:
@@ -151,8 +172,9 @@ public class ServletHandle extends AbstractHandler{
                             for(Infraction i : infs){
                                 if(clientSentence.contains(i.getOBuuid().toString())){
                                     inf = i;
-                                    ServletDBmanager.Incomplete.remove(i);
-//                                    break; idk how dis works
+                                    if(rtnclss.isDone()){
+                                        ServletDBmanager.Incomplete.remove(i);
+                                    }
                                 }
                             }
                             if(inf == null)
