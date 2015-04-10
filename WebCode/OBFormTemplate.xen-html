@@ -3,30 +3,38 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
 <font size="3">
-<div class="sectionMain" id="MainDiv">
+<div class="sectionMain" id="MainDiv" onload="alert({$up});">
 	<li class=scondaryContent obList">
 		<xen:foreach loop="$obs" value="$ob">
 			<a id={$ob}>
 			{$ob}
 			----
-			<button type="button" onClick="String(<xen:callback class='Dev_PageCallback_OBformPHP' method='getHTML'>{$ob}</xen:callback>)">Edit</button>
+			<button type="button" onClick="String(<xen:callback class='Dev_PageCallback_OBform' method='getHTML'>{$ob}</xen:callback>)">Edit</button>
+			----
+			<button type="button" onClick="String(<xen:callback class='Dev_PageCallback_OBform' method='getHTML'>record${$ob}</xen:callback>)">View Record</button>
 			</a>
 			<br>
 			<br>
 		</xen:foreach>
 		<a id="new">
-			<button type="button" onClick="<xen:callback class='Dev_PageCallback_OBformPHP' method='getHTML'>new</xen:callback>">Create new OB</button>
+			<button type="button" onClick="<xen:callback class='Dev_PageCallback_OBform' method='getHTML'>new</xen:callback>">Create new OB</button>
+		</a>
+		<br>
+		<br>
+		<a id="old">
+			<button type="button" onClick="<xen:callback class='Dev_PageCallback_OBform' method='getHTML'>archives</xen:callback>">view archives</button>
 		</a>
 	</li>
 	
 </div>
+<button type="button" onClick="location.reload();">Back</button>
 </font>
 <script>
 function Update(){
 	
          $.ajax({ 
 	 type: "POST",
-	 url: '/OBFormReturn.php',
+	 url: '/EnforcerSuite/OBFormReturn.php',
          data: {arguments: {
          obuuid: document.getElementById('obuuid').innerHTML,
          bannedOn:{
@@ -54,9 +62,18 @@ function Update(){
          	eauto: document.getElementById('RAuto').checked,
          }, 
          evidence: document.getElementById('evidence').value, 
-         notes: document.getElementById('notes').value
+         notes: document.getElementById('notes').value,
+         done: document.getElementById('done').checked
          }},
-         success: alert("Updated"); location.reload();
+         success: alert("Updated")
 	});
 }
+
+$(function()
+{
+if({$up} == 0){
+	alert("The server is down D:");
+	window.history.go(-1)
+}
+});
 </script>

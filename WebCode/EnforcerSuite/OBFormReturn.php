@@ -1,8 +1,9 @@
 <?php
 if(isset($_POST['arguments']) && !empty($_POST['arguments'])) {
+		echo "<script type='text/javascript'>alert('works');</script>";
         $host = "tcp://localhost"; 
         $port = 6789;
-        $data = 'return '.json_encode($_POST['arguments']).PHP_EOL;  //Adding PHP_EOL was the other part of the solution
+        $data = 'return $'.json_encode($_POST['arguments']).PHP_EOL;  //Adding PHP_EOL was the other part of the solution
         $errstr = '';
         $errno = '';
 
