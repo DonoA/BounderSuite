@@ -8,3 +8,4 @@ goals:
 * auto logs
 * simple image saver
 * Auto OB demote/promote
+* create secure TCP connections between build and the forums using MD5
