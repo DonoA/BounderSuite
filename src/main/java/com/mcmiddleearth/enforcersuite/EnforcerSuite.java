@@ -36,7 +36,7 @@ import org.bukkit.World;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.codehaus.jackson.map.ObjectMapper;
-import ru.tehkode.permissions.PermissionManager; //screw this API!!!
+//import ru.tehkode.permissions.PermissionManager; //screw this API!!!
 
 //Oathbreaker, Thrall, Commoner, Ranger, Artist, Foreman, Artisan, Steward, Enforcer, Valar
 /**
