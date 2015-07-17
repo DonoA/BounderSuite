@@ -5,7 +5,7 @@
 <font size="3">
 <div class="sectionMain" id="MainDiv" onload="alert({$up});">
 	User Lookup: <input type="text" id="evidence"> <button onClick="search()">Find</button>
-	<br><br><br>
+	<br><br>
 	OBs:
 	</hr>
 	Current:
@@ -17,6 +17,7 @@
 		{$s} <button onClick="alert('view')">view</button> <xen:if is="{$mod} == 1"><button onClick="alert('edit')">Edit</button> </xen:if>
 	</xen:foreach>
 	</hr>
+	<br><br>
 	Bans:
 	</hr>
 	Current:

@@ -4,38 +4,49 @@
 
 <font size="3">
 <div class="sectionMain" id="MainDiv" onload="alert({$up});">
+<!-- need to update to not use callbacks -->
 	<li class=scondaryContent obList">
 		<xen:foreach loop="$obs" value="$ob">
 			<a id={$ob}>
 			{$ob}
 			----
-			<button type="button" onClick="String(<xen:callback class='Dev_PageCallback_OBform' method='getHTML'>{$ob}</xen:callback>)">Edit</button>
+			<button type="button" onClick="Fetch(&quot;{$ob}&quot;)">Edit</button>
 			----
-			<button type="button" onClick="String(<xen:callback class='Dev_PageCallback_OBform' method='getHTML'>record${$ob}</xen:callback>)">View Record</button>
+			<button type="button" onClick="Fetch(record${$ob})">View Record</button>
 			</a>
 			<br>
 			<br>
 		</xen:foreach>
 		<a id="new">
-			<button type="button" onClick="<xen:callback class='Dev_PageCallback_OBform' method='getHTML'>new</xen:callback>">Create new OB</button>
+			<button type="button" onClick="Fetch('new')">Create new OB</button>
 		</a>
 		<br>
-		<br>
-		<a id="old">
-			<button type="button" onClick="<xen:callback class='Dev_PageCallback_OBform' method='getHTML'>archives</xen:callback>">view archives</button>
-		</a>
 	</li>
 	
 </div>
 <button type="button" onClick="location.reload();">Back</button>
 </font>
 <script>
+function Fetch(param){
+	$.ajax({ 
+	 type: "POST",
+	 url: '/EnforcerSuite/OBFormReturn.php',
+         data: {arguments: {
+         type: "fetch",
+         param: param
+         }},
+         success: function(data) {
+         	document.getElementById('MainDiv').innerHTML = data;
+         }
+         })
+}
 function Update(){
 	
          $.ajax({ 
 	 type: "POST",
 	 url: '/EnforcerSuite/OBFormReturn.php',
          data: {arguments: {
+         type: "update",
          obuuid: document.getElementById('obuuid').innerHTML,
          bannedOn:{
          	build: document.getElementById('B0').checked, 
@@ -62,10 +73,11 @@ function Update(){
          	eauto: document.getElementById('RAuto').checked,
          }, 
          evidence: document.getElementById('evidence').value, 
-         notes: document.getElementById('notes').value,
-         done: document.getElementById('done').checked
+         notes: document.getElementById('notes').value
          }},
-         success: alert("Updated")
+         success: function(data) {
+         	alert(data);
+         }
 	});
 }
 

@@ -4,24 +4,27 @@ class Dev_PageCallback_OBIndex{
     public static function respond(XenForo_Controller $controller, XenForo_ControllerResponse_Abstract $response){
 		echo "<script type='text/javascript'>alert('".json_encode(XenForo_Visitor::getInstance()->toArray()['is_moderator'])."');</script>";
 		$response->params['mod'] = XenForo_Visitor::getInstance()->toArray()['is_moderator'];
-        /*$host = "tcp://localhost"; 
+        $host = "tcp://localhost"; 
         $port = 6789;
-        $data = 'ping' . PHP_EOL;  //Adding PHP_EOL was the other part of the solution
+        $data = 'fetch archive' . PHP_EOL;  //Adding PHP_EOL was the other part of the solution
         $errstr = '';
         $errno = '';
 		$fp = @fsockopen($host, $port, $errno, $errstr, 1);
         if (!$fp){
 			$response->params['up'] = 0;
-            $obs = array();
+            $data = array();
         }else {
 			$response->params['up'] = 1;
             fwrite($fp, $data);
             while (! feof($fp)) {
-                $obs = json_decode(fgets($fp, 4096));
+                $data = json_decode(fgets($fp, 4096));
             }
             fclose($fp);
         }
-        $response->params['obs'] = $obs;*/
+        $response->params['obc'] = $obs["OBs"]["Current"];
+		$response->params['oba'] = $obs["OBs"]["Archived"];
+		$response->params['banc'] = $obs["Bans"]["Current"];
+		$response->params['bana'] = $obs["Bans"]["Archived"];
         $response->templateName = 'OBIndexTemplate';
     }
 	
