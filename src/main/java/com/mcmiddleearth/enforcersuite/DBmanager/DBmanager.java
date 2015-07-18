@@ -169,6 +169,7 @@ public class DBmanager {
             saveFin.delete();
             saveFin.renameTo(saveFin);
         }
+        DBmanager.OBs.remove(uuid);
         boolean successful = true;
         try {
             EnforcerSuite.getJSonParser().writeValue(saveStart, r);
@@ -349,14 +350,14 @@ public class DBmanager {
         return r.getOldInfractions().get(id);
      }
      
-    public static void addName(UUID uuid, String newName){
+    public static void addName(UUID uuid, String newName){ // make sure that all past names are saved
         File save = new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + uuid.toString() + ".record");
         Record r = null;
         if(save.exists()){
             try {
                 r = EnforcerSuite.getJSonParser().readValue(save, Record.class);
             } catch (IOException ex) {
-                LogUtil.printErr("Failed to archive Ban");
+                LogUtil.printErr("Failed to add name to record");
                 LogUtil.printDebugStack(ex);
                 return;
             }
@@ -377,7 +378,7 @@ public class DBmanager {
         try {
             EnforcerSuite.getJSonParser().writeValue(saveStart, r);
          } catch (IOException ex) {
-             LogUtil.printErr("Failed to archive Ban");
+             LogUtil.printErr("Failed to add name to record");
              LogUtil.printDebugStack(ex);
              successful = false;
          } finally {

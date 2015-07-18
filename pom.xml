@@ -28,7 +28,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>1.4</version>
+                    <version>1.7</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -39,8 +39,8 @@
                                     <minimizeJar>true</minimizeJar>
                                     <relocations>
                                         <relocation>
-                                            <pattern>org.codehaus</pattern>
-                                            <shadedPattern>com.mcmiddleearth.EnforcerSuite.libs.org.codehaus</shadedPattern>
+                                            <pattern>com.fasterxml</pattern>
+                                            <shadedPattern>com.mcmiddleearth.EnforcerSuite.libs.com.fasterxml</shadedPattern>
                                         </relocation>
                                         <relocation>
                                             <pattern>org.eclipse</pattern>
@@ -65,8 +65,8 @@
 </build>
     <repositories>
         <repository>
-            <id>bukkit-repo</id>
-            <url>http://repo.bukkit.org/content/groups/public/</url>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
         <repository>
             <id>pex-repo</id>
@@ -74,33 +74,43 @@
         </repository>
     </repositories>
     <dependencies>
+        <!--Spigot-API-->
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.7.9-R0.2</version>
-            <type>jar</type>
-            <scope>provided</scope>
+                  <groupId>org.spigotmc</groupId>
+                  <artifactId>spigot-api</artifactId>
+                  <version>1.8.3-R0.1-SNAPSHOT</version>
         </dependency>
+        <!--Bukkit API-->
+        <dependency>
+                    <groupId>org.bukkit</groupId>
+                    <artifactId>bukkit</artifactId>
+                    <version>1.8.3-R0.1-SNAPSHOT</version>
+        </dependency>
+        <!--Getters and Setter-->
         <dependency>
            <groupId>org.projectlombok</groupId>
            <artifactId>lombok</artifactId>
            <version>1.12.2</version>
            <type>jar</type>
         </dependency>
+        <!--Pex API-->
         <dependency>
             <groupId>ru.tehkode</groupId>
             <artifactId>PermissionsEx</artifactId>
             <version>1.22</version>
         </dependency>
+        <!--Eclipse Server (may be removed)-->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
             <version>9.1.0.v20131115</version>
         </dependency>
+        <!--JSON Parsing-->
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.13</version>
-        </dependency>
+         <groupId>com.fasterxml.jackson.core</groupId>
+         <artifactId>jackson-databind</artifactId>
+         <version>2.6.0-rc1</version>
+         <type>jar</type>
+      </dependency>
    </dependencies>
 </project>

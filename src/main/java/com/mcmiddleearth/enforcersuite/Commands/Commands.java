@@ -180,6 +180,7 @@ public class Commands implements CommandExecutor{
                     }else{
                         p.sendMessage(EnforcerSuite.getPrefix() + "You are no longer OB!");
                         ob.setFinished(new Date());
+                        ob.setDone(true);
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "promote " + p.getName());
                         ob.setRePromoted(true);
                         DBmanager.archiveOB(p.getUniqueId());
@@ -264,6 +265,11 @@ public class Commands implements CommandExecutor{
                         }
                     }
                 }
+            }
+            return true;
+        }else if(cmd.getName().equalsIgnoreCase("suitetool") && p.isOp() && args.length>0){
+            if(args[0].equalsIgnoreCase("dest") && DBmanager.OBs.containsKey(p.getUniqueId())){
+                p.teleport(DBmanager.OBs.get(p.getUniqueId()).getDestination().getCenter());
             }
             return true;
         }

@@ -26,4 +26,8 @@ commands:
     description: pardon a player from their sins
     usage: |
             /pardon <player>
+  suitetool:
+    description: Used for development (not for real use)
+    usage: |
+            /suitetool <command>
     

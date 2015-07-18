@@ -19,6 +19,8 @@
 
 package com.mcmiddleearth.enforcersuite.Records;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -39,17 +41,21 @@ public class Destination {
     @Getter @Setter
     private String name;
     public Destination(int Bounds[], String name){
-        Zbound1 = Bounds[0];//small
-        Zbound2 = Bounds[1];
-        Xbound1 = Bounds[2];//small
-        Xbound2 = Bounds[3];
+        Zbound1 = Math.min(Bounds[0], Bounds[1]);//small
+        Zbound2 = Math.max(Bounds[0], Bounds[1]);
+        Xbound1 = Math.min(Bounds[2], Bounds[3]);//small
+        Xbound2 = Math.max(Bounds[2], Bounds[3]);
         this.name = name;
     }
     public Destination(){
-        
     }
     public boolean inDes(Location loc){
-        return ((loc.getX()>this.Xbound1&&loc.getX()<this.Xbound2)&&(loc.getZ()>this.Zbound1&&loc.getZ()<this.Zbound2));
+        return ((loc.getX()>this.Xbound1&&loc.getX()<this.Xbound2)&&
+                (loc.getZ()>this.Zbound1&&loc.getZ()<this.Zbound2));
     }
-    
+    @JsonIgnore
+    public Location getCenter(){
+        return new Location(EnforcerSuite.getPlugin().getMainWorld(), 
+                    (Xbound1 + Xbound2)/2, 100, (Zbound1 + Zbound2)/2);
+    }
 }

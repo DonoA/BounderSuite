@@ -1,7 +1,8 @@
 BounderSuite
 ============
 
-[![Build Status](https://travis-ci.org/DonoA/MCME-BounderSuite.svg)](https://travis-ci.org/DonoA/MCME-BounderSuite)
+ [![Build Status] http://travis-ci.org/MCME/EnforcerSuite.svg)] http://travis-ci.org/MCME/EnforcerSuite)
+
 
 Plugin that eases bounder tasks
 

@@ -30,6 +30,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -100,7 +101,7 @@ public class ServletHandle extends AbstractHandler{
         
         @Override
         public void run() {
-            String req;
+            String[] req;
             ServerSocket welcomeSocket = null;
             try {
                 welcomeSocket = new ServerSocket(6789);
@@ -111,8 +112,11 @@ public class ServletHandle extends AbstractHandler{
                         BufferedReader inFromClient =
                                 new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                         DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-                        req = TCPkeyHandle.getRequest(inFromClient.readLine());
-                        if(req.equalsIgnoreCase("ping")){
+                        String h = (TCPkeyHandle.getRequest(inFromClient.readLine()));
+                        req = h.split("/-/");
+                        LogUtil.printDebug(h);
+                        LogUtil.printDebug(Arrays.toString(req));
+                        if(req[0].equalsIgnoreCase("ping")){
                             rtn.clear();
                             LogUtil.printDebug(ServletDBmanager.Incomplete);
                             for(Infraction inf : ServletDBmanager.Incomplete){
@@ -132,8 +136,8 @@ public class ServletHandle extends AbstractHandler{
                             }
                             LogUtil.printDebug("Successful Ping");
                             outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtn));
-                        }else if(req.contains("fetch")){
-                            if(req.contains("archive")){
+                        }else if(req[0].equalsIgnoreCase("fetch")){
+                            if(req[1].equalsIgnoreCase("archive")){
                                 HashMap<String, HashMap<String, ArrayList<String>>> toSend = new HashMap<String, HashMap<String, ArrayList<String>>>();
                                 HashMap<String, ArrayList<String>> bag =  new HashMap<String, ArrayList<String>>();
                                 //obs
@@ -141,6 +145,8 @@ public class ServletHandle extends AbstractHandler{
                                 List<String> hold = ServletDBmanager.getOBs(false);
                                 hold.removeAll(ServletDBmanager.getOBs(true));
                                 bag.put("Archived", new ArrayList<String>(hold));
+                                hold = ServletDBmanager.getOBs(true);
+                                hold.removeAll(ServletDBmanager.getOBs(false));
                                 toSend.put("OBs", bag);
                                 //bans
                                 bag =  new HashMap<String, ArrayList<String>>();
@@ -151,32 +157,30 @@ public class ServletHandle extends AbstractHandler{
                                 toSend.put("Bans", bag);
                                 //send
                                 outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(toSend));
-                            }else if(req.contains("record")){
-                                LogUtil.printDebug(req);
-                                int start = req.indexOf("$");
-                                String uuid = req.substring(start + 1, req.indexOf(" ", start));
+                                LogUtil.printDebug(EnforcerSuite.getJSonParser().writeValueAsString(toSend));
+                            }else if(req[1].equalsIgnoreCase("record")){
+                                String uuid = req[2].split(" - ")[0];
                                 LogUtil.printDebug(uuid);
+                                LogUtil.printDebug(ServletDBmanager.getRecord(UUID.fromString(uuid)).getOldInfractions());
                                 outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(ServletDBmanager.getRecord(UUID.fromString(uuid)).getOldInfractions()));
                             }else{
                                 for(Infraction inf : ServletDBmanager.Incomplete){
-                                    if(req.contains(inf.getOBuuid().toString())){
+                                    if(req[1].contains(inf.getOBuuid().toString())){
                                         outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(inf));
                                     }
                                 }
                             }
-                        }else if(req.contains("return")){ //only works with OBs in the current folder D:
-                            LogUtil.printDebug(req);
-                            req = req.substring(req.indexOf("$")+1);
-                            ReturnClass rtnclss = EnforcerSuite.getJSonParser().readValue(req, ReturnClass.class);
+                        }else if(req[0].equalsIgnoreCase("return")){ //only works with OBs in the current folder D:
+                            ReturnClass rtnclss = EnforcerSuite.getJSonParser().readValue(req[1], ReturnClass.class);
                             Infraction[] infs = new Infraction[ServletDBmanager.Incomplete.size()];
                             ServletDBmanager.Incomplete.toArray(infs);
                             Infraction inf = null;
                             for(Infraction i : infs){
-                                if(req.contains(i.getOBuuid().toString())){
+                                if(req[1].contains(i.getOBuuid().toString())){
                                     inf = i;
-                                    if(rtnclss.isDone()){
+                                    //if(rtnclss.isDone()){
                                         ServletDBmanager.Incomplete.remove(i);
-                                    }
+                                    //}
                                 }
                             }
                             if(inf == null)
@@ -259,9 +263,8 @@ public class ServletHandle extends AbstractHandler{
                             if(!Bukkit.getOfflinePlayer(UUID.fromString(rtnclss.getObuuid())).isOnline()){
                                 DBmanager.OBs.remove(UUID.fromString(rtnclss.getObuuid()));
                             }
-                        }else if(req.contains("request")){
-                            req = req.substring(req.indexOf("$")+1);
-                            RequestType request = EnforcerSuite.getJSonParser().readValue(req, RequestType.class);
+                        }else if(req[0].contains("request")){
+                            RequestType request = EnforcerSuite.getJSonParser().readValue(req[0], RequestType.class);
                             if(request.getBase().equalsIgnoreCase("archive")){
                                 DBmanager.archiveBan(UUID.fromString(request.getArgs()[0]));
                             }

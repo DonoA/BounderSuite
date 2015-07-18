@@ -47,9 +47,11 @@ public class ServletDBmanager {
     public static Record getRecord(UUID ob){
         File save = new File(DB + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + ob.toString() + ".record");
         if(save.exists()){
+            LogUtil.printDebug(save.getPath());
             try {
+                LogUtil.printDebug(EnforcerSuite.getJSonParser().writeValueAsString(EnforcerSuite.getJSonParser().readValue(save, Record.class)));
                 return EnforcerSuite.getJSonParser().readValue(save, Record.class);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 LogUtil.printErr("Failed to load Record");
                 LogUtil.printDebugStack(ex);
             }
