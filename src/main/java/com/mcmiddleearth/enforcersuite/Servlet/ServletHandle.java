@@ -117,23 +117,29 @@ public class ServletHandle extends AbstractHandler{
                         LogUtil.printDebug(h);
                         LogUtil.printDebug(Arrays.toString(req));
                         if(req[0].equalsIgnoreCase("ping")){
+                            ArrayList<Infraction> forRemoval = new ArrayList<>();
                             rtn.clear();
                             LogUtil.printDebug(ServletDBmanager.Incomplete);
                             for(Infraction inf : ServletDBmanager.Incomplete){
-                                if(inf.getOBname() == null){
-                                    if(inf.isBan()){
-                                        rtn.add(inf.getOBuuid().toString() + " - Ban");
+                                if(DBmanager.Bans.containsKey(inf.getOBuuid()) || DBmanager.OBs.containsKey(inf.getOBuuid())){
+                                    if(inf.getOBname() == null){
+                                        if(inf.isBan()){
+                                            rtn.add(inf.getOBuuid().toString() + " - Ban");
+                                        }else{
+                                            rtn.add(inf.getOBuuid().toString() + " - OathBreaker");
+                                        }
                                     }else{
-                                        rtn.add(inf.getOBuuid().toString() + " - OathBreaker");
+                                        if(inf.isBan()){
+                                            rtn.add(inf.getOBuuid().toString() + " - " + inf.getOBname() + " - " + "Ban");
+                                        }else{
+                                            rtn.add(inf.getOBuuid().toString() + " - " + inf.getOBname() + " - " + "OathBreaker");
+                                        }
                                     }
                                 }else{
-                                    if(inf.isBan()){
-                                        rtn.add(inf.getOBuuid().toString() + " - " + inf.getOBname() + " - " + "Ban");
-                                    }else{
-                                        rtn.add(inf.getOBuuid().toString() + " - " + inf.getOBname() + " - " + "OathBreaker");
-                                    }
+                                    forRemoval.add(inf);
                                 }
                             }
+                            ServletDBmanager.Incomplete.removeAll(forRemoval);
                             LogUtil.printDebug("Successful Ping");
                             outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtn));
                         }else if(req[0].equalsIgnoreCase("fetch")){
@@ -160,17 +166,18 @@ public class ServletHandle extends AbstractHandler{
                                 LogUtil.printDebug(EnforcerSuite.getJSonParser().writeValueAsString(toSend));
                             }else if(req[1].equalsIgnoreCase("record")){
                                 String uuid = req[2].split(" - ")[0];
-                                LogUtil.printDebug(uuid);
                                 LogUtil.printDebug(ServletDBmanager.getRecord(UUID.fromString(uuid)).getOldInfractions());
                                 outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(ServletDBmanager.getRecord(UUID.fromString(uuid)).getOldInfractions()));
                             }else{
                                 for(Infraction inf : ServletDBmanager.Incomplete){
                                     if(req[1].contains(inf.getOBuuid().toString())){
+                                        LogUtil.printDebug("sent: " + EnforcerSuite.getJSonParser().writeValueAsString(inf));
                                         outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(inf));
                                     }
                                 }
                             }
                         }else if(req[0].equalsIgnoreCase("return")){ //only works with OBs in the current folder D:
+                                                                     // should be fixed for now. need to firgure out ready for archive flag
                             ReturnClass rtnclss = EnforcerSuite.getJSonParser().readValue(req[1], ReturnClass.class);
                             Infraction[] infs = new Infraction[ServletDBmanager.Incomplete.size()];
                             ServletDBmanager.Incomplete.toArray(infs);

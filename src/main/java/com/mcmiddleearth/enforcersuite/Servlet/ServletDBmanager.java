@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -103,8 +104,11 @@ public class ServletDBmanager {
                 try {
                     Record rcrd = EnforcerSuite.getJSonParser().readValue(f, Record.class);
                     boolean isBan = false;
-                    for(Infraction i : rcrd.getOldInfractions().values()){
-                        if(i.isBan()){
+                    for(Entry<Integer, Infraction> i : rcrd.getOldInfractions().entrySet()){//needs more tests
+                        if(i.getValue() == null){
+                            rcrd.getOldInfractions().remove(i.getKey());
+                        }
+                        if(i.getValue().isBan()){
                             isBan = true;
                         }
                     }

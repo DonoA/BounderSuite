@@ -23,6 +23,7 @@ import com.mcmiddleearth.enforcersuite.Records.Destination;
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import com.mcmiddleearth.enforcersuite.Records.Record;
+import com.mcmiddleearth.enforcersuite.Servlet.ServletDBmanager;
 import com.mcmiddleearth.enforcersuite.Utils.LogUtil;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -151,7 +152,6 @@ public class DBmanager {
             r = new Record();
             r.setOB(uuid);
         }
-        
         Integer next = r.getOldInfractions().size();
         r.getOldInfractions().put(next, r.getCurrentInfraction());
         r.setCurrentInfraction(null);
@@ -288,9 +288,9 @@ public class DBmanager {
         Integer next = r.getOldInfractions().size();
         r.getOldInfractions().put(next, r.getCurrentInfraction());
         r.setCurrentInfraction(null);
-        if(DBmanager.OBs.get(uuid).getOBname() != null){
-            if(!r.getNames().contains(DBmanager.OBs.get(uuid).getOBname())){
-                r.getNames().add(DBmanager.OBs.get(uuid).getOBname());
+        if(DBmanager.Bans.get(uuid).getOBname() != null){
+            if(!r.getNames().contains(DBmanager.Bans.get(uuid).getOBname())){
+                r.getNames().add(DBmanager.Bans.get(uuid).getOBname());
             }
         }
         File OldInf = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + "Ban" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
