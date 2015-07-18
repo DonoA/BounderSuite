@@ -46,10 +46,10 @@
                                             <pattern>org.eclipse</pattern>
                                             <shadedPattern>com.mcmiddleearth.EnforcerSuite.libs.org.eclipse</shadedPattern>
                                         </relocation>
-                                        <relocation>
+                                        <!--relocation>
                                             <pattern>ru.tehkode</pattern>
                                             <shadedPattern>com.mcmiddleearth.EnforcerSuite.libs.ru.tehkode</shadedPattern>
-                                        </relocation>
+                                        </relocation-->
                                     </relocations>
                                     <artifactSet>
                                         <excludes>
@@ -68,10 +68,10 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
-        <repository>
+        <!--repository>
             <id>pex-repo</id>
             <url>http://pex-repo.zachsthings.com</url>
-        </repository>
+        </repository-->
     </repositories>
     <dependencies>
         <!--Spigot-API-->
@@ -93,12 +93,12 @@
            <version>1.12.2</version>
            <type>jar</type>
         </dependency>
-        <!--Pex API-->
+        <!--Pex API>
         <dependency>
             <groupId>ru.tehkode</groupId>
             <artifactId>PermissionsEx</artifactId>
             <version>1.22</version>
-        </dependency>
+        </dependency-->
         <!--Eclipse Server (may be removed)-->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
