@@ -3,40 +3,69 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
 <font size="3">
+User Lookup: <input type="text" id="find"> <button onClick="getSearch()">Find</button>
 <div class="sectionMain" id="MainDiv" onload="alert({$up});">
-	User Lookup: <input type="text" id="evidence"> <button onClick="search()">Find</button>
-	<br><br><br>
 	OBs:
-	</hr>
+	<hr />
 	Current:
+	<br />
 	<xen:foreach loop="$obc" value="$s">
-		{$s} <button onClick="alert('view')">view</button> <xen:if is="{$mod} == 1"><button onClick="alert('edit')">Edit</button> </xen:if>
+		{$s} <button onClick="getView('record/-/{$s}')">view</button> <xen:if is="{$mod} == 1"><button onClick="getEdit('{$s}')">Edit</button> </xen:if>
+		<br />
 	</xen:foreach>
 	Archive:
+	<br />
 	<xen:foreach loop="$oba" value="$s">
-		{$s} <button onClick="alert('view')">view</button> <xen:if is="{$mod} == 1"><button onClick="alert('edit')">Edit</button> </xen:if>
+		{$s} <button onClick="getView('record/-/{$s}')">view</button> <xen:if is="{$mod} == 1"><button onClick="getEdit('{$s}')">Edit</button> </xen:if>
+		<br />
 	</xen:foreach>
 	</hr>
+	<br /><br />
 	Bans:
-	</hr>
+	<hr />
 	Current:
+	<br />
 	<xen:foreach loop="$banc" value="$s">
-		{$s} <button onClick="alert('view')">view</button> <xen:if is="{$mod} == 1"><button onClick="alert('edit')">Edit</button> </xen:if>
+		{$s} <button onClick="getView('record/-/{$s}')">view</button> <xen:if is="{$mod} == 1"><button onClick="getEdit('{$s}')">Edit</button> </xen:if>
+		<br />
 	</xen:foreach>
 	Archive:
+	<br />
 	<xen:foreach loop="$bana" value="$s">
-		{$s} <button onClick="alert('view')">view</button> <xen:if is="{$mod} == 1"><button onClick="alert('edit')">Edit</button> </xen:if>
+		{$s} <button onClick="getView('record/-/{$s}')">view</button> <xen:if is="{$mod} == 1"><button onClick="getEdit('{$s}')">Edit</button> </xen:if>
+		<br />
 	</xen:foreach>
 </div>
-
+<button type="button" id="backbtn" onClick="location.reload(); document.getElementById('backbtn').style='visibility: hidden;'" style="visibility: visible;">Back</button>
 <script>
 function getView(name){
-	alert(name);
+	$.ajax({ 
+	 type: "POST",
+	 url: '/EnforcerSuite/OBFormReturn.php',
+         data: {arguments: {
+         type: "fetch",
+         param: name
+         }},
+         success: function(data) {
+         	document.getElementById('MainDiv').innerHTML = data;
+         }
+         })
 } 
 function getEdit(name){
 	alert(name);
 }
-function getSearch(name){
-	alert(name);
+function getSearch(){
+	var name = 'record/-/' + document.getElementById('find').value;
+	$.ajax({ 
+	 type: "POST",
+	 url: '/EnforcerSuite/OBFormReturn.php',
+         data: {arguments: {
+         type: "fetch",
+         param: name
+         }},
+         success: function(data) {
+         	document.getElementById('MainDiv').innerHTML = data;
+         }
+         })
 }
 </script>

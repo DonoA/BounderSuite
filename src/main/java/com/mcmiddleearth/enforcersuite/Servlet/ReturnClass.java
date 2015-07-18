@@ -32,6 +32,9 @@ import lombok.Setter;
 public class ReturnClass {
     
     @Getter @Setter
+    private String type;
+    
+    @Getter @Setter
     private String obuuid;
     
     @Getter @Setter

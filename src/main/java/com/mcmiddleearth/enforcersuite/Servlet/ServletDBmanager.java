@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,9 +48,11 @@ public class ServletDBmanager {
     public static Record getRecord(UUID ob){
         File save = new File(DB + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + ob.toString() + ".record");
         if(save.exists()){
+            LogUtil.printDebug(save.getPath());
             try {
+                LogUtil.printDebug(EnforcerSuite.getJSonParser().writeValueAsString(EnforcerSuite.getJSonParser().readValue(save, Record.class)));
                 return EnforcerSuite.getJSonParser().readValue(save, Record.class);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 LogUtil.printErr("Failed to load Record");
                 LogUtil.printDebugStack(ex);
             }
@@ -101,8 +104,11 @@ public class ServletDBmanager {
                 try {
                     Record rcrd = EnforcerSuite.getJSonParser().readValue(f, Record.class);
                     boolean isBan = false;
-                    for(Infraction i : rcrd.getOldInfractions().values()){
-                        if(i.isBan()){
+                    for(Entry<Integer, Infraction> i : rcrd.getOldInfractions().entrySet()){//needs more tests
+                        if(i.getValue() == null){
+                            rcrd.getOldInfractions().remove(i.getKey());
+                        }
+                        if(i.getValue().isBan()){
                             isBan = true;
                         }
                     }

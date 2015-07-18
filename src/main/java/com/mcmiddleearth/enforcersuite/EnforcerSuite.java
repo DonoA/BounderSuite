@@ -19,6 +19,7 @@
 
 package com.mcmiddleearth.enforcersuite;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mcmiddleearth.enforcersuite.Listeners.LoginListen;
 import com.mcmiddleearth.enforcersuite.Commands.Commands;
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
@@ -35,8 +36,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.codehaus.jackson.map.ObjectMapper;
-import ru.tehkode.permissions.PermissionManager; //screw this API!!!
+//import ru.tehkode.permissions.PermissionManager; //screw this API!!!
 
 //Oathbreaker, Thrall, Commoner, Ranger, Artist, Foreman, Artisan, Steward, Enforcer, Valar
 /**
@@ -80,7 +80,11 @@ public class EnforcerSuite extends JavaPlugin{
         getCommand("done").setExecutor(new Commands());
         getCommand("getinfo").setExecutor(new Commands());
         getCommand("pardon").setExecutor(new Commands());
+        getCommand("suitetool").setExecutor(new Commands());
         MainWorld = Bukkit.getWorld(this.getConfig().getString("MainWorld"));
+        if(MainWorld == null){
+            MainWorld = Bukkit.getWorlds().get(0);
+        }
         if(this.getConfig().getBoolean("useServlet")){
             int port = this.getConfig().getInt("port");
             servlet = new Servlet(port);

@@ -30,7 +30,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
@@ -84,6 +84,9 @@ public class Infraction {
     
     @Getter @Setter
     private boolean ban = false;
+    
+//    @Getter @Setter
+//    private boolean ReadyForArchive = false;
     
     public Infraction(int sev, String rank, Player enforcer, UUID OB){
         this.Destination = DBmanager.LoadDest(sev);
