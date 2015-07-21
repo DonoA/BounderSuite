@@ -135,6 +135,7 @@ public class DBmanager {
         Integer next = r.getOldInfractions().size();
         r.getOldInfractions().put(next, DBmanager.OBs.get(uuid));
         r.setCurrentInfraction(null);
+        
         if(DBmanager.OBs.get(uuid).getOBname() != null){
             if(!r.getNames().contains(DBmanager.OBs.get(uuid).getOBname())){
                 r.getNames().add(DBmanager.OBs.get(uuid).getOBname());
@@ -142,7 +143,7 @@ public class DBmanager {
         }
         File OldInf = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + "OB" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
         OldInf.delete();
-        
+        DBmanager.OBs.remove(uuid);
         DBmanager.saveRecord(r);
         
     }
@@ -234,7 +235,7 @@ public class DBmanager {
         }
         File OldInf = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + "Ban" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
         OldInf.delete();
-        
+        DBmanager.Bans.remove(uuid);
         DBmanager.saveRecord(r);
     }
     

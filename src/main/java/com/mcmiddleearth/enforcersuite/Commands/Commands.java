@@ -220,7 +220,7 @@ public class Commands implements CommandExecutor{
                     return true;
                 }else if(DBmanager.OBs.containsKey(op.getUniqueId())){
                     Infraction ob = DBmanager.OBs.get(op.getUniqueId());
-                    p.sendMessage(EnforcerSuite.getPrefix() + "You are no longer OB!");
+                    op.getPlayer().sendMessage(EnforcerSuite.getPrefix() + "You are no longer OB!");
                     ob.setFinished(new Date());
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "promote " + op.getName());
                     ob.setRePromoted(true);
@@ -240,7 +240,6 @@ public class Commands implements CommandExecutor{
                     }
                     if(DBmanager.loadOB(op.getUniqueId())){
                         Infraction ob = DBmanager.OBs.get(op.getUniqueId());
-//                        op.getPlayer().sendMessage(EnforcerSuite.getPrefix() + "You are no longer OB!");
                         ob.setFinished(new Date());
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "promote " + op.getName());
                         ob.setRePromoted(true);

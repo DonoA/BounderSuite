@@ -13,11 +13,10 @@
                     '<input type=&quot;radio&quot; name=&quot;E&quot; value=&quot;Credoo&quot; />Credoo<br> <br>'.
                     '<input type=&quot;radio&quot; name=&quot;E&quot; value=&quot;Dynodaring64&quot; />Dynodaring64<br> <br>'.
                     '<input type=&quot;radio&quot; name=&quot;E&quot; value=&quot;Ghundra&quot; />Ghundra<br> <br>'.
-                    '<input type=&quot;radio&quot; name=&quot;E&quot; value=&quot;Iru_&quot; />Iru_<br> <br>'.
-                    '<input type=&quot;radio&quot; name=&quot;E&quot; value=&quot;SugarKoala&quot; />SugarKoala<br> <br>'.
+                    '<input type=&quot;radio&quot; name=&quot;E&quot; value=&quot;Kulmo&quot; />Kulmo<br> <br>'.
                     '<input type=&quot;radio&quot; name=&quot;E&quot; value=&quot;q220&quot; />q220<br> <br>'.
-                    '<input type=&quot;radio&quot; name=&quot;E&quot; value=&quot;Shenjtor&quot; />Shenjtor<br> <br>'.
-                    '<input type=&quot;radio&quot; name=&quot;E&quot; value=&quot;MaDIIRed&quot; />MaDIIRed<br><br><br> <br><hr><h1>Banned On:</h1><br>'.
+                    '<input type=&quot;radio&quot; name=&quot;E&quot; value=&quot;MaDIIRed&quot; />MaDIIRed<br><br><br>'.
+                    '<br><hr><h1>Banned On:</h1><br>'.
                     '<input type=&quot;checkbox&quot; id=&quot;B0&quot;/> Build<br><br>'.
                     '<input type=&quot;checkbox&quot; id=&quot;B1&quot;/> Freebuild<br><br>'.
                     '<input type=&quot;checkbox&quot; id=&quot;B2&quot;/> TeamSpeak<br><br>'.
@@ -48,7 +47,7 @@
 				$errstr = '';
 				$errno = '';
 
-				if ( ($fp = fsockopen($host, $port, $errno, $errstr, 3) ) === FALSE)
+				if (($fp = fsockopen($host, $port, $errno, $errstr, 3) ) === FALSE)
 					$obdat = array();
 				else {
 					fwrite($fp, $data);
@@ -59,9 +58,25 @@
 					fclose($fp);
 				}
 				$data = str_replace('"',"&quot;",$data);
-				echo "'".$data."'";
+                $newDiv = "<p>This player has been punished ".count((array) $obrec)." times <br />";
+                for($i = count((array) $obrec) -1; $i >= 0; $i--){
+                    $newDiv = $newDiv."<hr />";
+                    $rec = $obrec->$i;
+                    if($rec->ban){
+                        $newDiv = $newDiv."Ban that was ".($rec->severity == 1? "appealable": "non-appealable")."<br />";
+                        $newDiv = $newDiv."It has since ".($rec->done ? "been": "not been"). " appealed <br />";
+                        $newDiv = $newDiv."The player was banned for ".json_encode($rec->reasons)."<br />";
+                    }else{
+                        $newDiv = $newDiv."This OB was ".($rec->severity == 1? "first": "second")." degree <br />";
+                        $newDiv = $newDiv."It has since ".($rec->done ? "been": "not been"). " finished <br />";
+                        $newDiv = $newDiv."The player was OBed for ".json_encode($rec->reasons)."<br />";
+                    }
+                    $newDiv = $newDiv."The infraction occured on: ".date("Y-m-d H:i:s", $rec->demotion/1000);
+                    $newDiv = $newDiv."<br />";
+                }
+				echo $newDiv."<br />".$data;
 			}else{
-				$data = 'fetch/-/'.$param.PHP_EOL;  //Adding PHP_EOL was the other part of the solution
+				$data = 'fetch/-/'.$param.PHP_EOL;
 				$errstr = '';
 				$errno = '';
 
