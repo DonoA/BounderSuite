@@ -1,3 +1,2 @@
  - add Hash encryption
- - change inline call backs to ajax requests
- - moar
+ - add editable records

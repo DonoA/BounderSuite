@@ -28,6 +28,7 @@ import com.mcmiddleearth.enforcersuite.Servlet.Servlet;
 import com.mcmiddleearth.enforcersuite.Servlet.ServletDBmanager;
 import com.mcmiddleearth.enforcersuite.Servlet.ServletHandle;
 import com.mcmiddleearth.enforcersuite.Utils.LogUtil;
+import java.io.File;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,7 +37,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-//import ru.tehkode.permissions.PermissionManager; //screw this API!!!
 
 //Oathbreaker, Thrall, Commoner, Ranger, Artist, Foreman, Artisan, Steward, Enforcer, Valar
 /**
@@ -69,6 +69,10 @@ public class EnforcerSuite extends JavaPlugin{
     public void onEnable(){
         this.saveDefaultConfig();
         this.reloadConfig();
+        if(!new File(this.getDataFolder() + FileSep + "Destination-DB").exists()){
+            LogUtil.printErr("No Destinations found, terminating plugin");
+            this.getPluginLoader().disablePlugin(this);
+        }
         JSonParser = new ObjectMapper();
         plugin = this;
         Debug = this.getConfig().getBoolean("debug");

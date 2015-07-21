@@ -45,22 +45,7 @@ public class ServletDBmanager {
     
     public static List<Infraction> Incomplete = new ArrayList<>();
     
-    public static Record getRecord(UUID ob){
-        File save = new File(DB + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + ob.toString() + ".record");
-        if(save.exists()){
-            LogUtil.printDebug(save.getPath());
-            try {
-                LogUtil.printDebug(EnforcerSuite.getJSonParser().writeValueAsString(EnforcerSuite.getJSonParser().readValue(save, Record.class)));
-                return EnforcerSuite.getJSonParser().readValue(save, Record.class);
-            } catch (Exception ex) {
-                LogUtil.printErr("Failed to load Record");
-                LogUtil.printDebugStack(ex);
-            }
-        }
-        Record r = new Record();
-        r.setOB(new UUID(0,0));
-        return r;
-    }
+    
     public static Infraction loadReturnOB(UUID uuid){
         File save = new File(DB + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + "OB" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
         if(!save.exists())

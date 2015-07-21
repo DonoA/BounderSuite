@@ -101,27 +101,7 @@ public class DBmanager {
             r.setOB(uuid);
         }
         r.setCurrentInfraction(DBmanager.OBs.get(uuid));
-        saveStart = new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + uuid.toString() + ".new.record");
-        saveFin = new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + uuid.toString() + ".record");
-        if(saveFin.exists()&&saveStart.exists()){
-            saveFin.delete();
-            saveFin.renameTo(saveFin);
-        }
-        successful = true;
-        try {
-            EnforcerSuite.getJSonParser().writeValue(saveStart, r);
-         } catch (IOException ex) {
-             LogUtil.printErr("Failed to save OB");
-             LogUtil.printDebugStack(ex);
-             successful = false;
-         } finally {
-             if (successful) {
-                 if (saveFin.exists()) {
-                     saveFin.delete();
-                 }
-                 saveStart.renameTo(saveFin);
-             }
-         }
+        DBmanager.saveRecord(r);
     }
     public static boolean loadOB(UUID uuid){
         File save = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + "OB" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
@@ -153,7 +133,7 @@ public class DBmanager {
             r.setOB(uuid);
         }
         Integer next = r.getOldInfractions().size();
-        r.getOldInfractions().put(next, r.getCurrentInfraction());
+        r.getOldInfractions().put(next, DBmanager.OBs.get(uuid));
         r.setCurrentInfraction(null);
         if(DBmanager.OBs.get(uuid).getOBname() != null){
             if(!r.getNames().contains(DBmanager.OBs.get(uuid).getOBname())){
@@ -163,28 +143,7 @@ public class DBmanager {
         File OldInf = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + "OB" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
         OldInf.delete();
         
-        File saveStart = new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + uuid.toString() + ".new.record");
-        File saveFin = new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + uuid.toString() + ".record");
-        if(saveFin.exists()&&saveStart.exists()){
-            saveFin.delete();
-            saveFin.renameTo(saveFin);
-        }
-        DBmanager.OBs.remove(uuid);
-        boolean successful = true;
-        try {
-            EnforcerSuite.getJSonParser().writeValue(saveStart, r);
-         } catch (IOException ex) {
-             LogUtil.printErr("Failed to archive OB");
-             LogUtil.printDebugStack(ex);
-             successful = false;
-         } finally {
-             if (successful) {
-                 if (saveFin.exists()) {
-                     saveFin.delete();
-                 }
-                 saveStart.renameTo(saveFin);
-             }
-         }
+        DBmanager.saveRecord(r);
         
     }
     public static Destination LoadDest(int sev){
@@ -246,27 +205,7 @@ public class DBmanager {
             r.setOB(uuid);
         }
         r.setCurrentInfraction(DBmanager.Bans.get(uuid));
-        saveStart = new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + uuid.toString() + ".new.record");
-        saveFin = new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + uuid.toString() + ".record");
-        if(saveFin.exists()&&saveStart.exists()){
-            saveFin.delete();
-            saveFin.renameTo(saveFin);
-        }
-        successful = true;
-        try {
-            EnforcerSuite.getJSonParser().writeValue(saveStart, r);
-         } catch (IOException ex) {
-             LogUtil.printErr("Failed to save Ban");
-             LogUtil.printDebugStack(ex);
-             successful = false;
-         } finally {
-             if (successful) {
-                 if (saveFin.exists()) {
-                     saveFin.delete();
-                 }
-                 saveStart.renameTo(saveFin);
-             }
-         }
+        DBmanager.saveRecord(r);
     }
     
     public static void archiveBan(UUID uuid){
@@ -286,7 +225,7 @@ public class DBmanager {
         }
         
         Integer next = r.getOldInfractions().size();
-        r.getOldInfractions().put(next, r.getCurrentInfraction());
+        r.getOldInfractions().put(next, DBmanager.Bans.get(uuid));
         r.setCurrentInfraction(null);
         if(DBmanager.Bans.get(uuid).getOBname() != null){
             if(!r.getNames().contains(DBmanager.Bans.get(uuid).getOBname())){
@@ -296,27 +235,7 @@ public class DBmanager {
         File OldInf = new File(OBFiles + System.getProperty("file.separator") + "Current" + System.getProperty("file.separator") + "Ban" + System.getProperty("file.separator") + uuid.toString() + ".obdat");
         OldInf.delete();
         
-        File saveStart = new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + uuid.toString() + ".new.record");
-        File saveFin = new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + uuid.toString() + ".record");
-        if(saveFin.exists()&&saveStart.exists()){
-            saveFin.delete();
-            saveFin.renameTo(saveFin);
-        }
-        boolean successful = true;
-        try {
-            EnforcerSuite.getJSonParser().writeValue(saveStart, r);
-         } catch (IOException ex) {
-             LogUtil.printErr("Failed to archive Ban");
-             LogUtil.printDebugStack(ex);
-             successful = false;
-         } finally {
-             if (successful) {
-                 if (saveFin.exists()) {
-                     saveFin.delete();
-                 }
-                 saveStart.renameTo(saveFin);
-             }
-         }
+        DBmanager.saveRecord(r);
     }
     
     public static boolean loadBan(UUID uuid){
@@ -368,8 +287,27 @@ public class DBmanager {
         if(!r.getNames().contains(newName)){
             r.getNames().add(newName);
         }
-        File saveStart = new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + uuid.toString() + ".new.record");
-        File saveFin = new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + uuid.toString() + ".record");
+        DBmanager.saveRecord(r);
+    }
+    public static Record getRecord(UUID ob){
+        File save = new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + ob.toString() + ".record");
+        if(save.exists()){
+            LogUtil.printDebug(save.getPath());
+            try {
+                LogUtil.printDebug(EnforcerSuite.getJSonParser().writeValueAsString(EnforcerSuite.getJSonParser().readValue(save, Record.class)));
+                return EnforcerSuite.getJSonParser().readValue(save, Record.class);
+            } catch (Exception ex) {
+                LogUtil.printErr("Failed to load Record");
+                LogUtil.printDebugStack(ex);
+            }
+        }
+        Record r = new Record();
+        r.setOB(new UUID(0,0));
+        return r;
+    }
+    public static void saveRecord(Record r){
+        File saveStart =  new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + r.getOB().toString() + ".record.new");
+        File saveFin =  new File(OBFiles + System.getProperty("file.separator") + "Records" + System.getProperty("file.separator") + r.getOB().toString() + ".record");
         if(saveFin.exists()&&saveStart.exists()){
             saveFin.delete();
             saveFin.renameTo(saveFin);
@@ -378,7 +316,7 @@ public class DBmanager {
         try {
             EnforcerSuite.getJSonParser().writeValue(saveStart, r);
          } catch (IOException ex) {
-             LogUtil.printErr("Failed to add name to record");
+             LogUtil.printErr("Failed to archive Ban");
              LogUtil.printDebugStack(ex);
              successful = false;
          } finally {
