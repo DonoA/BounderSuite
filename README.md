@@ -17,6 +17,4 @@ goals:
 * create secure TCP connections between build and the forums
 * 
 
-Setting up the zenforo (Really only for MCME devs):
-* First install zenforo from a clean copy
-* (ill add the rest when i have slept)
+
