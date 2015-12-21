@@ -1,18 +1,18 @@
 /*
- * This file is part of BoundHelper.
+ * This file is part of EnforcerSuite.
  * 
- * BoundHelper is free software: you can redistribute it and/or modify
+ * EnforcerSuite is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
- * BoundHelper is distributed in the hope that it will be useful,
+ * EnforcerSuite is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with BoundHelper.  If not, see <http://www.gnu.org/licenses/>.
+ * along with EnforcerSuite.  If not, see <http://www.gnu.org/licenses/>.
  * 
  * 
  */
@@ -71,7 +71,7 @@ public class Infraction {
     private ArrayList<String> Reasons = new ArrayList<>();
     
     @Getter @Setter
-    private ArrayList<Object> Evidence = new ArrayList<>();
+    private ArrayList<String> Evidence = new ArrayList<>();
     
     @Getter @Setter
     private String notes;
@@ -96,6 +96,7 @@ public class Infraction {
         this.demotion = new Date();
 //        this.OBname = OB.getName();
         this.OBuuid = OB;
+        BannedOn.add("freebuild");
     }
     
     public Infraction(int sev, String rank, Player enforcer, UUID OB, String OBname){
@@ -106,6 +107,29 @@ public class Infraction {
         this.demotion = new Date();
         this.OBname = OBname;
         this.OBuuid = OB;
+        BannedOn.add("freebuild");
+    }
+    
+    public Infraction(int sev, String rank, UUID OB){
+        this.Destination = DBmanager.LoadDest(sev);
+        this.rank = rank;
+        this.Severity = sev;
+        this.Enforcer = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        this.demotion = new Date();
+//        this.OBname = OB.getName();
+        this.OBuuid = OB;
+        BannedOn.add("freebuild");
+    }
+    
+    public Infraction(int sev, String rank, UUID OB, String OBname){
+        this.Destination = DBmanager.LoadDest(sev);
+        this.rank = rank;
+        this.Severity = sev;
+        this.Enforcer = UUID.fromString("00000000-0000-0000-0000-000000000000");;
+        this.demotion = new Date();
+        this.OBname = OBname;
+        this.OBuuid = OB;
+        BannedOn.add("freebuild");
     }
     
     public Infraction(){}

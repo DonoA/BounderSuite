@@ -17,10 +17,10 @@
  * 
  */
 package com.mcmiddleearth.enforcersuite.Utils;
-
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
@@ -32,7 +32,7 @@ public class LogUtil {
     
     public static void printDebug(Object msg){
         if(EnforcerSuite.isDebug())
-            Bukkit.getLogger().info(EnforcerSuite.getPrefix() + " [DEBUG] " + msg.toString());
+            Bukkit.getLogger().log(Level.INFO, "[EnforcerSuite] [DEBUG] {0}", msg.toString());
     }
     
     public static void printDebugStack(Exception ex){
@@ -40,15 +40,15 @@ public class LogUtil {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             ex.printStackTrace(pw);
-            Bukkit.getLogger().info(EnforcerSuite.getPrefix() + " [DEBUG] [ERROR] " + sw.toString());
+            Bukkit.getLogger().log(Level.INFO, "[EnforcerSuite] [DEBUG] [ERROR] {0}", sw.toString());
         }
     }
     
     public static void printInfo(Object msg){
-        Bukkit.getLogger().info(EnforcerSuite.getPrefix() + msg.toString());
+        Bukkit.getLogger().log(Level.INFO, "[EnforcerSuite] {0}", msg.toString());
     }
     
     public static void printErr(Object msg){
-        Bukkit.getLogger().severe(EnforcerSuite.getPrefix() + ChatColor.RED + " [ERROR] " + msg.toString());
+        Bukkit.getLogger().log(Level.SEVERE, "[EnforcerSuite]{0} [ERROR] {1}", new Object[]{ChatColor.RED, msg.toString()});
     }
 }

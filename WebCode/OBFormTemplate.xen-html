@@ -29,63 +29,69 @@
 <script>
 function Fetch(param){
 	$.ajax({ 
-	 type: "POST",
-	 url: '/EnforcerSuite/OBFormReturn.php',
-         data: {arguments: {
-         type: "fetch",
-         param: param
-         }},
-         success: function(data) {
-         	document.getElementById('MainDiv').innerHTML = data;
-         }
-         })
+		 type: "POST",
+		 url: '/EnforcerSuite/OBFormReturn.php',
+	         data: {arguments: {
+		         type: "fetch",
+		         param: param
+	         }},
+	         success: function(data) {
+	         	document.getElementById('MainDiv').innerHTML = data;
+	         }
+         });
 }
-function Update(){
-	
+function Reply(complete){
+	var evi = [];
+	$('#evidence').children('input').each(function () {
+		if(this.value != ""){
+			evi.push(this.value);
+	    	}
+	});
          $.ajax({ 
-	 type: "POST",
-	 url: '/EnforcerSuite/OBFormReturn.php',
-         data: {arguments: {
-         type: "update",
-         obuuid: document.getElementById('obuuid').innerHTML,
-         bannedOn:{
-         	build: document.getElementById('B0').checked, 
-         	freebuild: document.getElementById('B1').checked, 
-         	teamspeak: document.getElementById('B2').checked, 
-         	forums: document.getElementById('B3').checked, 
-         	othercheck: document.getElementById('B4').checked, 
-         	othertxt: document.getElementById('B5').value,
-         	eauto: document.getElementById('BAuto').checked
-         },
-         reasons:{
-         	blocks: document.getElementById('R0').checked,
-         	spam: document.getElementById('R1').checked,
-         	social: document.getElementById('R2').checked,
-         	ignoring: document.getElementById('R3').checked,
-         	impersonating: document.getElementById('R4').checked,
-         	mods: document.getElementById('R5').checked,
-         	ads: document.getElementById('R6').checked,
-         	obassist: document.getElementById('R7').checked,
-         	teamspeak: document.getElementById('R8').checked,
-         	alt: document.getElementById('R9').checked,
-         	othercheck: document.getElementById('R10').checked,
-         	othertxt: document.getElementById('R11').value,
-         	eauto: document.getElementById('RAuto').checked,
-         }, 
-         evidence: document.getElementById('evidence').value, 
-         notes: document.getElementById('notes').value
-         }},
-         success: function(data) {
-         	alert(data);
-         }
+		 type: "POST",
+		 url: '/EnforcerSuite/OBFormReturn.php',
+	         data: {arguments: {
+		         type: "update",
+		         obuuid: document.getElementById('obuuid').innerHTML,
+		         bannedOn:{
+		         	build: document.getElementById('B0').checked, 
+		         	freebuild: document.getElementById('B1').checked, 
+		         	teamspeak: document.getElementById('B2').checked, 
+		         	forums: document.getElementById('B3').checked, 
+		         	othercheck: document.getElementById('B4').checked, 
+		         	othertxt: document.getElementById('B5').value,
+		         	eauto: document.getElementById('BAuto').checked
+		         },
+		         reasons:{
+		         	blocks: document.getElementById('R0').checked,
+		         	spam: document.getElementById('R1').checked,
+		         	social: document.getElementById('R2').checked,
+		         	ignoring: document.getElementById('R3').checked,
+		         	impersonating: document.getElementById('R4').checked,
+		         	mods: document.getElementById('R5').checked,
+		         	ads: document.getElementById('R6').checked,
+		         	obassist: document.getElementById('R7').checked,
+		         	teamspeak: document.getElementById('R8').checked,
+		         	alt: document.getElementById('R9').checked,
+		         	othercheck: document.getElementById('R10').checked,
+		         	othertxt: document.getElementById('R11').value,
+		         	eauto: document.getElementById('RAuto').checked,
+		         }, 
+		         evidence: evi, 
+		         notes: document.getElementById('notes').value,
+		         complete: complete
+	         }},
+	         success: function(data) {
+	         	alert(data);
+	         	location.reload();
+	         }
 	});
 }
 
-$(function()
-{
-if({$up} == 0){
-	alert("The server is down D:");
-	window.history.go(-1)
-}
+$(function(){
+	if({$up} == 0){
+		alert("Unable to reach database (the server is probs down)");
+		window.history.go(-1)
+	}
 });
 </script>

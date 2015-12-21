@@ -1,18 +1,18 @@
 /*
- * This file is part of BoundHelper.
+ * This file is part of EnforcerSuite.
  * 
- * BoundHelper is free software: you can redistribute it and/or modify
+ * EnforcerSuite is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
- * BoundHelper is distributed in the hope that it will be useful,
+ * EnforcerSuite is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with BoundHelper.  If not, see <http://www.gnu.org/licenses/>.
+ * along with EnforcerSuite.  If not, see <http://www.gnu.org/licenses/>.
  * 
  * 
  */
@@ -25,7 +25,10 @@ import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import com.mcmiddleearth.enforcersuite.Records.Infraction;
 import com.mcmiddleearth.enforcersuite.Servlet.ServletDBmanager;
 import com.mcmiddleearth.enforcersuite.Utils.LogUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,13 +38,14 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 //import ru.tehkode.permissions.bukkit.PermissionsEx;
 /**
  *
  * @author Donovan
  */
-public class Commands implements CommandExecutor{
+public class Commands implements CommandExecutor, TabCompleter{
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String Label, String[] args){
         if(sender instanceof Player){
@@ -51,7 +55,7 @@ public class Commands implements CommandExecutor{
             // cmd   args[0]    args[1]   args[2] args[3]
 
             //ob <name|uuid> <1|2> [convo]
-            //ban <name|uuid> <1|2> [convo]
+            //ban <name|uuid> <1|appealable> [convo]
 
             if(p.hasPermission("enforcerHelper.punish")&&args.length>1&&cmd.getName().equalsIgnoreCase("ob")){
                 if(args.length < 2){
@@ -82,33 +86,33 @@ public class Commands implements CommandExecutor{
                         }
                         DBmanager.saveOB(ob.getUniqueId()); //save OB to file
 
-                        p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+ob.getName());
-                        p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + ob.getUniqueId().toString());
+                        sender.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+ob.getName());
+                        sender.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + ob.getUniqueId().toString());
                         ServletDBmanager.Incomplete.add(inf);
                         ob.sendMessage(EnforcerSuite.getPrefix()+"You are an OathBreaker now");
                         ob.sendMessage(EnforcerSuite.getPrefix()+"Your destination is " + ChatColor.RED + inf.getDestination().getName());
                     }else{
-                        p.sendMessage(EnforcerSuite.getPrefix()+ob.getName() + " is already OB!");
+                        sender.sendMessage(EnforcerSuite.getPrefix()+ob.getName() + " is already OB!");
                     }
                 }else{
                     if(!DBmanager.loadOB(op.getUniqueId())){
                         if(op.hasPlayedBefore()){
-                            Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, op.getUniqueId());
+                            Infraction inf = new Infraction(Integer.parseInt(args[1]), "none", p, op.getUniqueId());
                             DBmanager.OBs.put(op.getUniqueId(), inf);
                             for(int j=0; j <= 3; j++){
                                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + op.getName());
                             }
                             DBmanager.saveOB(op.getUniqueId());
                             DBmanager.OBs.remove(op.getUniqueId());
-                            p.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+op.getName());
-                            p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + op.getUniqueId().toString());
+                            sender.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+op.getName());
+                            sender.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + op.getUniqueId().toString());
                             ServletDBmanager.Incomplete.add(inf);
                         }else{
-                            p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
+                            sender.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
                         }
                     }else{
                         DBmanager.OBs.remove(op.getUniqueId());
-                        p.sendMessage(EnforcerSuite.getPrefix() + "That player is already OB!");
+                        sender.sendMessage(EnforcerSuite.getPrefix() + "That player is already OB!");
                     }
                 }
                 //When the OB isn't online there file will be loaded on start
@@ -132,8 +136,14 @@ public class Commands implements CommandExecutor{
                 }
 
                 if(!op.isBanned()){
+                    int type = 0;
+                    if(args[1].equalsIgnoreCase("appealable")){
+                        type=1;
+                    }else if(args[1].equalsIgnoreCase("permanent")){
+                        type=2;
+                    }
                     if(op.hasPlayedBefore()){
-                        Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(op.getName()).getPrefix()*/ "none", p, op.getUniqueId(), op.getName());
+                        Infraction inf = new Infraction(type, "none", p, op.getUniqueId(), op.getName());
                         inf.setBan(true);
                         DBmanager.Bans.put(op.getUniqueId(), inf);
                         DBmanager.saveBan(op.getUniqueId());
@@ -146,15 +156,15 @@ public class Commands implements CommandExecutor{
                         if(op.isOnline()){
                             op.getPlayer().kickPlayer("You have been banned");
                         }
-                        p.sendMessage(EnforcerSuite.getPrefix()+"You have Banned "+op.getName());
-                        p.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this Ban, uuid " + op.getUniqueId().toString());
+                        sender.sendMessage(EnforcerSuite.getPrefix()+"You have Banned "+op.getName());
+                        sender.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this Ban, uuid " + op.getUniqueId().toString());
                         ServletDBmanager.Incomplete.add(inf);
                         return true;
                     }else{
-                        p.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
+                        sender.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
                     }
                 }else{
-                    p.sendMessage(EnforcerSuite.getPrefix()+op.getName() + " is already Banned!");
+                    sender.sendMessage(EnforcerSuite.getPrefix()+op.getName() + " is already Banned!");
                 }
 
             }else if(cmd.getName().equalsIgnoreCase("done")){
@@ -268,8 +278,156 @@ public class Commands implements CommandExecutor{
             }
             return false;
         }else{
-            sender.sendMessage("No console support yet!");// TODO add this
-            return true;
+            if(args.length>1&&cmd.getName().equalsIgnoreCase("ob")){
+                if(args.length < 2){
+                    return false;
+                }
+                try{ // check that arg 1 is and int
+                    Integer.parseInt(args[1]);
+                }catch (NumberFormatException e){
+                    return false;
+                }
+                OfflinePlayer op;
+                String opName = "nill";
+                try{
+                    op = Bukkit.getOfflinePlayer(UUID.fromString(args[0]));
+                }catch (Exception e){
+                    op = Bukkit.getOfflinePlayer(args[0]);
+                    opName = args[0];
+                }
+                if(op.isOnline()){
+                    Player ob = op.getPlayer();
+                    if(!DBmanager.OBs.containsKey(ob.getUniqueId())){
+                        ob.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
+                        Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", ob.getUniqueId(), ob.getName());
+                        inf.setStarted(true);
+                        DBmanager.OBs.put(ob.getUniqueId(), inf);
+                        for(int j=0; j <= 3; j++){
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + ob.getName());
+                        }
+                        DBmanager.saveOB(ob.getUniqueId()); //save OB to file
+
+                        sender.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+ob.getName());
+                        sender.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + ob.getUniqueId().toString());
+                        ServletDBmanager.Incomplete.add(inf);
+                        ob.sendMessage(EnforcerSuite.getPrefix()+"You are an OathBreaker now");
+                        ob.sendMessage(EnforcerSuite.getPrefix()+"Your destination is " + ChatColor.RED + inf.getDestination().getName());
+                    }else{
+                        sender.sendMessage(EnforcerSuite.getPrefix()+ob.getName() + " is already OB!");
+                    }
+                }else{
+                    if(!DBmanager.loadOB(op.getUniqueId())){
+                        if(op.hasPlayedBefore()){
+                            Infraction inf = new Infraction(Integer.parseInt(args[1]), "none", op.getUniqueId());
+                            DBmanager.OBs.put(op.getUniqueId(), inf);
+                            for(int j=0; j <= 3; j++){
+                                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + op.getName());
+                            }
+                            DBmanager.saveOB(op.getUniqueId());
+                            DBmanager.OBs.remove(op.getUniqueId());
+                            sender.sendMessage(EnforcerSuite.getPrefix()+"You have OathBreakered "+op.getName());
+                            sender.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this OB, uuid " + op.getUniqueId().toString());
+                            ServletDBmanager.Incomplete.add(inf);
+                        }else{
+                            sender.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
+                        }
+                    }else{
+                        DBmanager.OBs.remove(op.getUniqueId());
+                        sender.sendMessage(EnforcerSuite.getPrefix() + "That player is already OB!");
+                    }
+                }
+                //When the OB isn't online there file will be loaded on start
+                return true;
+            }else if(args.length>1&&cmd.getName().equalsIgnoreCase("ban")){
+                if(args.length < 2){
+                    return false;
+                }
+                try{ // check that arg 1 is and int
+                    Integer.parseInt(args[1]);
+                }catch (NumberFormatException e){
+                    return false;
+                }
+                OfflinePlayer op;
+                String opName = "nill";
+                try{
+                    op = Bukkit.getOfflinePlayer(UUID.fromString(args[0]));
+                }catch (Exception e){
+                    op = Bukkit.getOfflinePlayer(args[0]);
+                    opName = args[0];
+                }
+
+                if(!op.isBanned()){
+                    int type = 0;
+                    if(args[1].equalsIgnoreCase("appealable")){
+                        type=1;
+                    }else if(args[1].equalsIgnoreCase("permanent")){
+                        type=2;
+                    }
+                    if(op.hasPlayedBefore()){
+                        Infraction inf = new Infraction(type, "none", op.getUniqueId(), op.getName());
+                        inf.setBan(true);
+                        DBmanager.Bans.put(op.getUniqueId(), inf);
+                        DBmanager.saveBan(op.getUniqueId());
+                        try {
+                            LogUtil.printDebug(EnforcerSuite.getJSonParser().writeValueAsString(DBmanager.Bans));
+                        } catch (JsonProcessingException ex) {
+                            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        op.setBanned(true);
+                        if(op.isOnline()){
+                            op.getPlayer().kickPlayer("You have been banned");
+                        }
+                        sender.sendMessage(EnforcerSuite.getPrefix()+"You have Banned "+op.getName());
+                        sender.sendMessage(EnforcerSuite.getPrefix()+"Connect to the forums to finish this Ban, uuid " + op.getUniqueId().toString());
+                        ServletDBmanager.Incomplete.add(inf);
+                        return true;
+                    }else{
+                        sender.sendMessage(EnforcerSuite.getPrefix() + "That Player has never played before");
+                    }
+                }else{
+                    sender.sendMessage(EnforcerSuite.getPrefix()+op.getName() + " is already Banned!");
+                }
+
+            }
         }
+        return false;
+    }
+    
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String Label, String[] args){
+        List<String> plrs = new ArrayList<String>();
+        for(Player p : Bukkit.getOnlinePlayers()){
+            plrs.add(p.getName());
+        }
+        if(cmd.getName().equalsIgnoreCase("done")){
+            return new ArrayList<String>();
+        }else if(cmd.getName().equalsIgnoreCase("pardon")&&args.length==0){
+            return plrs;
+        }else if(cmd.getName().equalsIgnoreCase("ob")){
+            if(args.length==0){
+                return plrs;
+            }else if(args.length==1){
+                return Arrays.asList(new String[] {"1", "2"});
+            }else{
+                return new ArrayList<String>();
+            }
+        }else if(cmd.getName().equalsIgnoreCase("ban")){
+            if(args.length==0){
+                return plrs;
+            }else if(args.length==1){
+                return Arrays.asList(new String[] {"appealable", "permanent"});
+            }else{
+                return new ArrayList<String>();
+            }
+        }else if(cmd.getName().equalsIgnoreCase("ob")){
+            if(args.length==0){
+                return plrs;
+            }else if(args.length==1){
+                return Arrays.asList(new String[] {"1", "2"});
+            }else{
+                return new ArrayList<String>();
+            }
+        }
+        return null;
     }
 }

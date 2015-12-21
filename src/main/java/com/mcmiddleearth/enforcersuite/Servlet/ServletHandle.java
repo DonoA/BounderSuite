@@ -1,18 +1,18 @@
 /*
- * This file is part of BoundHelper.
+ * This file is part of EnforcerSuite.
  * 
- * BoundHelper is free software: you can redistribute it and/or modify
+ * EnforcerSuite is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
- * BoundHelper is distributed in the hope that it will be useful,
+ * EnforcerSuite is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with BoundHelper.  If not, see <http://www.gnu.org/licenses/>.
+ * along with EnforcerSuite.  If not, see <http://www.gnu.org/licenses/>.
  * 
  * 
  */
@@ -173,7 +173,7 @@ public class ServletHandle extends AbstractHandler{
                                     }
                                 }
                             }
-                        }else if(req[0].equalsIgnoreCase("return")){ //only works with OBs in the current folder D:
+                        }else if(req[0].equalsIgnoreCase("return")){
                             ReturnClass rtnclss = EnforcerSuite.getJSonParser().readValue(req[1], ReturnClass.class);
                             Infraction[] infs = new Infraction[ServletDBmanager.Incomplete.size()];
                             ServletDBmanager.Incomplete.toArray(infs);
@@ -181,9 +181,9 @@ public class ServletHandle extends AbstractHandler{
                             for(Infraction i : infs){
                                 if(req[1].contains(i.getOBuuid().toString())){
                                     inf = i;
-                                    //if(rtnclss.isDone()){
+                                    if(rtnclss.isComplete()){
                                         ServletDBmanager.Incomplete.remove(i);
-                                    //}
+                                    }
                                 }
                             }
                             if(inf == null)
@@ -211,7 +211,7 @@ public class ServletHandle extends AbstractHandler{
                                 inf.getBannedOn().add("forums");
                             }
                             if(rtnclss.getBannedOn().isOthercheck()){
-                                inf.getBannedOn().add(rtnclss.getBannedOn().getOthertxt());
+                                inf.getBannedOn().add("OTHER_"+rtnclss.getBannedOn().getOthertxt());
                             }
                             //reasons
                             if(rtnclss.getReasons().isBlocks()){
@@ -258,9 +258,9 @@ public class ServletHandle extends AbstractHandler{
                                 inf.getReasons().add("Alt Account");
                             }
                             if(rtnclss.getReasons().isOthercheck()){
-                                inf.getReasons().add(rtnclss.getReasons().getOthertxt());
+                                inf.getReasons().add("OTHER_"+rtnclss.getReasons().getOthertxt());
                             }
-                            inf.getEvidence().add(rtnclss.getEvidence());
+                            inf.setEvidence(new ArrayList<String>(Arrays.asList(rtnclss.getEvidence())));
                             inf.setNotes(rtnclss.getNotes());
                             if(!inf.isBan()){
                                 if(DBmanager.OBs.containsKey(UUID.fromString(rtnclss.getObuuid()))){

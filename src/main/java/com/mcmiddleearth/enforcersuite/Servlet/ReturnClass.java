@@ -44,13 +44,13 @@ public class ReturnClass {
     private ReturnClass.reasons reasons; 
     
     @Getter @Setter
-    private String evidence;
+    private String[] evidence;
     
     @Getter @Setter
     private String notes;
     
     @Getter @Setter
-    private boolean done;
+    private boolean complete;
     
     public ReturnClass(){}
             

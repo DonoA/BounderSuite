@@ -1,18 +1,18 @@
 /*
- * This file is part of BoundHelper.
+ * This file is part of EnforcerSuite.
  * 
- * BoundHelper is free software: you can redistribute it and/or modify
+ * EnforcerSuite is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
- * BoundHelper is distributed in the hope that it will be useful,
+ * EnforcerSuite is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with BoundHelper.  If not, see <http://www.gnu.org/licenses/>.
+ * along with EnforcerSuite.  If not, see <http://www.gnu.org/licenses/>.
  * 
  * 
  */
@@ -63,7 +63,7 @@ public class EnforcerSuite extends JavaPlugin{
     private static ObjectMapper JSonParser;
     
     @Getter
-    private static boolean Debug;
+    private static boolean Debug = true;
             
     @Override
     public void onEnable(){
@@ -75,7 +75,7 @@ public class EnforcerSuite extends JavaPlugin{
         }
         JSonParser = new ObjectMapper();
         plugin = this;
-        Debug = this.getConfig().getBoolean("debug");
+        Debug = true;//this.getConfig().getBoolean("debug");
         PluginManager pm = this.getServer().getPluginManager();
         pm.registerEvents(new LoginListen(), this);
         pm.registerEvents(new SaveListen(), this);
@@ -85,6 +85,12 @@ public class EnforcerSuite extends JavaPlugin{
         getCommand("getinfo").setExecutor(new Commands());
         getCommand("pardon").setExecutor(new Commands());
         getCommand("suitetool").setExecutor(new Commands());
+        getCommand("ob").setTabCompleter(new Commands());
+        getCommand("ban").setTabCompleter(new Commands());
+        getCommand("done").setTabCompleter(new Commands());
+        getCommand("getinfo").setTabCompleter(new Commands());
+        getCommand("pardon").setTabCompleter(new Commands());
+        getCommand("suitetool").setTabCompleter(new Commands());
         MainWorld = Bukkit.getWorld(this.getConfig().getString("MainWorld"));
         if(MainWorld == null){
             MainWorld = Bukkit.getWorlds().get(0);

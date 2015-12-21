@@ -52,15 +52,25 @@ function getView(name){
          })
 } 
 function getEdit(name){
-	alert(name);
-}
-function getSearch(){
-	var name = 'record/-/' + document.getElementById('find').value;
 	$.ajax({ 
 	 type: "POST",
 	 url: '/EnforcerSuite/OBFormReturn.php',
          data: {arguments: {
          type: "fetch",
+         param: name
+         }},
+         success: function(data) {
+         	document.getElementById('MainDiv').innerHTML = data;
+         }
+         })
+}
+function getSearch(){
+	var name = document.getElementById('find').value;
+	$.ajax({ 
+	 type: "POST",
+	 url: '/EnforcerSuite/OBFormReturn.php',
+         data: {arguments: {
+         type: "search",
          param: name
          }},
          success: function(data) {
