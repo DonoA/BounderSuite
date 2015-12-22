@@ -4,6 +4,7 @@
 
 <font size="3">
 <div class="sectionMain" id="MainDiv" onload="alert({$up});">
+
 <!-- need to update to not use callbacks -->
 	<li class=scondaryContent obList">
 		<xen:foreach loop="$obs" value="$ob">
@@ -79,7 +80,8 @@ function Reply(complete){
 		         }, 
 		         evidence: evi, 
 		         notes: document.getElementById('notes').value,
-		         complete: complete
+		         complete: complete,
+		         key: "{$key}"
 	         }},
 	         success: function(data) {
 	         	alert(data);
