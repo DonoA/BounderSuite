@@ -1,4 +1,6 @@
 port: 1337
 debug: true
-MainWorld: "world"
+MainWorld: "AAAAA"
 useServlet: true
+cipher: "57238004e784498bbc2f8bf984565090"
+adminkey: "12341234"

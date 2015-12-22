@@ -52,6 +52,9 @@ public class ReturnClass {
     @Getter @Setter
     private boolean complete;
     
+    @Getter @Setter
+    private String key;
+    
     public ReturnClass(){}
             
     public class bannedOn {

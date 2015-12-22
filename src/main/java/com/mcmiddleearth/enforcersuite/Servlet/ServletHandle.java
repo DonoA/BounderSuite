@@ -104,6 +104,7 @@ public class ServletHandle extends AbstractHandler{
         public void run() {
             String[] req;
             ServerSocket welcomeSocket = null;
+            TCPkeyHandle keyHandle = new TCPkeyHandle();
             try {
                 welcomeSocket = new ServerSocket(6789);
                 List<String> rtn = new ArrayList<>();
@@ -113,7 +114,7 @@ public class ServletHandle extends AbstractHandler{
                         BufferedReader inFromClient =
                                 new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                         DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-                        String h = (TCPkeyHandle.getRequest(inFromClient.readLine()));
+                        String h = (inFromClient.readLine());
                         req = h.split("/-/");
                         LogUtil.printDebug(h);
                         LogUtil.printDebug(Arrays.toString(req));
@@ -175,6 +176,12 @@ public class ServletHandle extends AbstractHandler{
                             }
                         }else if(req[0].equalsIgnoreCase("return")){
                             ReturnClass rtnclss = EnforcerSuite.getJSonParser().readValue(req[1], ReturnClass.class);
+                            if(!TCPkeyHandle.validRequest(rtnclss.getKey())){
+                                outToClient.writeBytes("Invalid key!");
+                                return;
+                            }else{
+                                outToClient.writeBytes("All changes saved!");
+                            }
                             Infraction[] infs = new Infraction[ServletDBmanager.Incomplete.size()];
                             ServletDBmanager.Incomplete.toArray(infs);
                             Infraction inf = null;
@@ -322,6 +329,8 @@ public class ServletHandle extends AbstractHandler{
                             if(request.getBase().equalsIgnoreCase("archive")){
                                 DBmanager.archiveBan(UUID.fromString(request.getArgs()[0]));
                             }
+                        }else if(req[0].contains("validate")){
+                            outToClient.writeBytes(String.valueOf(TCPkeyHandle.addKey(req[1], req[2])));
                         }
                     } catch (IOException ex) {
                         LogUtil.printErr("Failed to Decode from forum");
