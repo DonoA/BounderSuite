@@ -88,22 +88,22 @@ public class Infraction {
 //    @Getter @Setter
 //    private boolean ReadyForArchive = false;
     
-    public Infraction(int sev, String rank, Player enforcer, UUID OB){
+    public Infraction(int sev, String rank, UUID enforcer, UUID OB){
         this.Destination = DBmanager.LoadDest(sev);
         this.rank = rank;
         this.Severity = sev;
-        this.Enforcer = enforcer.getUniqueId();
+        this.Enforcer = enforcer;
         this.demotion = new Date();
 //        this.OBname = OB.getName();
         this.OBuuid = OB;
         BannedOn.add("freebuild");
     }
     
-    public Infraction(int sev, String rank, Player enforcer, UUID OB, String OBname){
+    public Infraction(int sev, String rank, UUID enforcer, UUID OB, String OBname){
         this.Destination = DBmanager.LoadDest(sev);
         this.rank = rank;
         this.Severity = sev;
-        this.Enforcer = enforcer.getUniqueId();
+        this.Enforcer = enforcer;
         this.demotion = new Date();
         this.OBname = OBname;
         this.OBuuid = OB;

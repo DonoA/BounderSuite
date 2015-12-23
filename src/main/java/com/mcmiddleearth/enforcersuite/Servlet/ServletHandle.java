@@ -19,6 +19,8 @@
 
 package com.mcmiddleearth.enforcersuite.Servlet;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mcmiddleearth.enforcersuite.Commands.Commands;
 import com.mcmiddleearth.enforcersuite.DBmanager.DBmanager;
 import com.mcmiddleearth.enforcersuite.EnforcerSuite;
 import com.mcmiddleearth.enforcersuite.Records.Infraction;
@@ -32,15 +34,21 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 /**
@@ -164,8 +172,8 @@ public class ServletHandle extends AbstractHandler{
                                 LogUtil.printDebug(EnforcerSuite.getJSonParser().writeValueAsString(toSend));
                             }else if(req[1].equalsIgnoreCase("record")){
                                 String uuid = req[2].split(" - ")[0];
-                                LogUtil.printDebug(DBmanager.getRecord(UUID.fromString(uuid)).getOldInfractions());
-                                outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(DBmanager.getRecord(UUID.fromString(uuid)).getOldInfractions()));
+                                LogUtil.printDebug("wrote: "+EnforcerSuite.getJSonParser().writeValueAsString(DBmanager.getRecord(UUID.fromString(uuid))));
+                                outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(DBmanager.getRecord(UUID.fromString(uuid))));
                             }else{
                                 for(Infraction inf : ServletDBmanager.Incomplete){
                                     if(req[1].contains(inf.getOBuuid().toString())){
@@ -175,8 +183,8 @@ public class ServletHandle extends AbstractHandler{
                                 }
                             }
                         }else if(req[0].equalsIgnoreCase("return")){
-                            ReturnClass rtnclss = EnforcerSuite.getJSonParser().readValue(req[1], ReturnClass.class);
-                            if(!TCPkeyHandle.validRequest(rtnclss.getKey())){
+                            ReturnClasses.Update rtnclss = EnforcerSuite.getJSonParser().readValue(req[1], ReturnClasses.Update.class);
+                            if(!TCPkeyHandle.validRequest(rtnclss.getKey(), true)){
                                 outToClient.writeBytes("Invalid key!");
                                 return;
                             }else{
@@ -195,6 +203,8 @@ public class ServletHandle extends AbstractHandler{
                             }
                             if(inf == null)
                                 return;
+                            inf.getBannedOn().clear();
+                            inf.getReasons().clear();
                             //bans
                             if(rtnclss.getBannedOn().isBuild()){
                                 inf.getBannedOn().add("build");
@@ -324,6 +334,238 @@ public class ServletHandle extends AbstractHandler{
                                     DBmanager.saveRecord(r);
                                 }
                             }
+                        }else if(req[0].equalsIgnoreCase("add")){
+                            ReturnClasses.Create rtnclss = EnforcerSuite.getJSonParser().readValue(req[1], ReturnClasses.Create.class);
+                            ErrorType rtnmsg = new ErrorType();
+                            if(!TCPkeyHandle.validRequest(rtnclss.getKey(), false)){
+                                rtnmsg.setMsg("Invalid key!");
+                                rtnmsg.setErr(1);
+                                outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
+                                return;
+                            }
+                            Infraction[] infs = new Infraction[ServletDBmanager.Incomplete.size()];
+                            ServletDBmanager.Incomplete.toArray(infs);
+                            Infraction inf = null;
+                            
+                            OfflinePlayer op = Bukkit.getOfflinePlayer(UUID.fromString(rtnclss.getObuuid()));
+                            if(!rtnclss.isBan()){
+                                if(op.isOnline()){
+                                    Player ob = op.getPlayer();
+                                    if(!DBmanager.OBs.containsKey(ob.getUniqueId())){
+                                        ob.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
+                                        inf = new Infraction(Integer.parseInt(rtnclss.getSev().substring(0, 1)), "none", Bukkit.getOfflinePlayer(rtnclss.getEnforcer()).getUniqueId(), ob.getUniqueId(), ob.getName());
+                                        inf.setStarted(true);
+                                        DBmanager.OBs.put(ob.getUniqueId(), inf);
+                                        for(int j=0; j <= 3; j++){
+                                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + ob.getName());
+                                        }
+                                        DBmanager.saveOB(ob.getUniqueId()); //save OB to file
+
+                                        rtnmsg.setMsg("You have OathBreakered "+ob.getName());
+                                        rtnmsg.setErr(0);
+                                        ob.sendMessage(EnforcerSuite.getPrefix()+"You are an OathBreaker now");
+                                        ob.sendMessage(EnforcerSuite.getPrefix()+"Your destination is " + ChatColor.RED + inf.getDestination().getName());
+                                    }else{
+                                        rtnmsg.setMsg(ob.getName() + " is already OB!");
+                                        rtnmsg.setErr(1);
+                                        outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
+                                        return;
+                                    }
+                                }else{
+                                    if(!DBmanager.loadOB(op.getUniqueId())){
+                                        if(op.hasPlayedBefore()){
+                                            inf = new Infraction(Integer.parseInt(rtnclss.getSev().substring(0, 1)), "none", Bukkit.getOfflinePlayer(rtnclss.getEnforcer()).getUniqueId(), op.getUniqueId());
+                                            DBmanager.OBs.put(op.getUniqueId(), inf);
+                                            for(int j=0; j <= 3; j++){
+                                                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + op.getName());
+                                            }
+                                            DBmanager.saveOB(op.getUniqueId());
+                                            DBmanager.OBs.remove(op.getUniqueId());
+                                            rtnmsg.setMsg("You have OathBreakered "+op.getUniqueId());
+                                            rtnmsg.setErr(0);
+                                        }else{
+                                            rtnmsg.setMsg("That Player has never played before");
+                                            rtnmsg.setErr(1);
+                                            outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
+                                            return;
+                                        }
+                                    }else{
+                                        DBmanager.OBs.remove(op.getUniqueId());
+                                        rtnmsg.setMsg("That player is already OB!");
+                                        rtnmsg.setErr(1);
+                                        outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
+                                        return;
+                                    }
+                                }
+                            }else if(rtnclss.isBan()){
+                                if(!op.isBanned()){
+                                    int type = Integer.parseInt(rtnclss.getSev().substring(0, 1));
+                                    if(op.hasPlayedBefore()){
+                                        inf = new Infraction(type, "none", Bukkit.getOfflinePlayer(rtnclss.getEnforcer()).getUniqueId(), op.getUniqueId(), op.getName());
+                                        inf.setBan(true);
+                                        DBmanager.Bans.put(op.getUniqueId(), inf);
+                                        DBmanager.saveBan(op.getUniqueId());
+                                        try {
+                                            LogUtil.printDebug(EnforcerSuite.getJSonParser().writeValueAsString(DBmanager.Bans));
+                                        } catch (JsonProcessingException ex) {
+                                            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                        op.setBanned(true);
+                                        if(op.isOnline()){
+                                            op.getPlayer().kickPlayer("You have been banned");
+                                        }
+                                        rtnmsg.setMsg("You have Banned "+op.getName());
+                                        rtnmsg.setErr(0);
+                                    }else{
+                                        rtnmsg.setMsg("That Player has never played before");
+                                        rtnmsg.setErr(1);
+                                        outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
+                                        return;
+                                    }
+                                }else{
+                                    rtnmsg.setMsg(op.getName() + " is already Banned!");
+                                    rtnmsg.setErr(1);
+                                    outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
+                                    return;
+                                }
+                            }
+                            inf.getBannedOn().clear();
+                            inf.setDemotion(new Date((long)Integer.parseInt(rtnclss.getDemoted())*1000));
+                            inf.setBan(rtnclss.isBan());
+                            //bans
+                            if(rtnclss.getBannedOn().isBuild()){
+                                inf.getBannedOn().add("build");
+                                if(rtnclss.getBannedOn().isEauto()){
+                                    //ban them
+                                }
+                            }
+                            if(rtnclss.getBannedOn().isFreebuild()){
+                                inf.getBannedOn().add("freebuild");
+                                if(rtnclss.getBannedOn().isEauto()){
+                                    //ban them
+                                }
+                            }
+                            if(rtnclss.getBannedOn().isTeamspeak()){
+                                inf.getBannedOn().add("teamspeak");
+                                if(rtnclss.getBannedOn().isEauto()){
+                                    //ban them
+                                }
+                            }
+                            if(rtnclss.getBannedOn().isForums()){
+                                inf.getBannedOn().add("forums");
+                            }
+                            if(rtnclss.getBannedOn().isOthercheck()){
+                                inf.getBannedOn().add("OTHER_"+rtnclss.getBannedOn().getOthertxt());
+                            }
+                            //reasons
+                            if(rtnclss.getReasons().isBlocks()){
+                                inf.getReasons().add("Unauthorised Block Break/Place");
+                                if(rtnclss.getReasons().isEauto()){
+                                    //Collect Evidence
+                                }
+                            }
+                            if(rtnclss.getReasons().isSpam()){
+                                inf.getReasons().add("Spamming Chat");
+                                if(rtnclss.getReasons().isEauto()){
+                                    //Collect Evidence
+                                }
+                            }
+                            if(rtnclss.getReasons().isSocial()){
+                                inf.getReasons().add("Social Indiscretion (Inappropriate Username, Profane/Derogatory Language, "
+                                        + "Political/Religious Discussions, Referencing Vulgar/Explicit Material)");
+                            }
+                            if(rtnclss.getReasons().isIgnoring()){
+                                inf.getReasons().add("Ignoring Staff Direction / Impeding Work");
+                            }
+                            if(rtnclss.getReasons().isImpersonating()){
+                                inf.getReasons().add("Impersonating Staff Member");
+                            }
+                            if(rtnclss.getReasons().isMods()){
+                                inf.getReasons().add("Use of Detrimental 3rd Party Mods");
+                            }
+                            if(rtnclss.getReasons().isAds()){
+                                inf.getReasons().add("Advertising");
+                                if(rtnclss.getReasons().isEauto()){
+                                    //Collect Evidence
+                                }
+                            }
+                            if(rtnclss.getReasons().isObassist()){
+                                inf.getReasons().add("Assisting Oathbreakers");
+                                if(rtnclss.getReasons().isEauto()){
+                                    //Collect Evidence
+                                }
+                            }
+                            if(rtnclss.getReasons().isTeamspeak()){
+                                inf.getReasons().add("TeamSpeak (Infractions)");
+                            }
+                            if(rtnclss.getReasons().isAlt()){
+                                inf.getReasons().add("Alt Account");
+                            }
+                            if(rtnclss.getReasons().isOthercheck()){
+                                inf.getReasons().add("OTHER_"+rtnclss.getReasons().getOthertxt());
+                            }
+                            inf.setEvidence(new ArrayList<String>(Arrays.asList(rtnclss.getEvidence())));
+                            inf.setNotes(rtnclss.getNotes());
+                            if(!inf.isBan()){
+                                if(DBmanager.OBs.containsKey(UUID.fromString(rtnclss.getObuuid()))){
+                                    Infraction saved = DBmanager.OBs.get(UUID.fromString(rtnclss.getObuuid()));
+                                    inf.setDone(saved.isDone());
+                                    inf.setFinished(saved.getFinished());
+                                    inf.setRePromoted(saved.isRePromoted());
+                                    inf.setStarted(saved.isStarted());
+                                    DBmanager.OBs.put(UUID.fromString(rtnclss.getObuuid()), inf);
+                                    DBmanager.saveOB(UUID.fromString(rtnclss.getObuuid()));
+                                }else{
+                                    Record r = DBmanager.getRecord(UUID.fromString(rtnclss.getObuuid()));
+                                    Infraction saved = null;
+                                    if(r.getCurrentInfraction() == null){
+                                        saved = r.getOldInfractions().get(r.getOldInfractions().size()-1);
+                                    }else{
+                                        saved = r.getCurrentInfraction();
+                                    }
+                                    inf.setDone(saved.isDone());
+                                    inf.setFinished(saved.getFinished());
+                                    inf.setRePromoted(saved.isRePromoted());
+                                    inf.setStarted(saved.isStarted());
+                                    if(inf.getFinished() == null){
+                                        DBmanager.OBs.put(UUID.fromString(rtnclss.getObuuid()), inf);
+                                        DBmanager.saveOB(UUID.fromString(rtnclss.getObuuid()));
+                                        DBmanager.OBs.remove(UUID.fromString(rtnclss.getObuuid()));
+                                        r.setCurrentInfraction(inf);
+                                        DBmanager.saveRecord(r);
+                                    }else{
+                                        r.getOldInfractions().put(r.getOldInfractions().size()-1, inf);
+                                        DBmanager.saveRecord(r);
+                                    }
+                                }
+                            }else{
+                                Record r = DBmanager.getRecord(UUID.fromString(rtnclss.getObuuid()));
+                                Infraction saved = null;
+                                if(r.getCurrentInfraction() == null){
+                                    saved = r.getOldInfractions().get(r.getOldInfractions().size()-1);
+                                }else{
+                                    saved = r.getCurrentInfraction();
+                                }
+                                inf.setDone(saved.isDone());
+                                inf.setFinished(saved.getFinished());
+                                inf.setRePromoted(saved.isRePromoted());
+                                inf.setStarted(saved.isStarted());
+                                if(inf.getFinished() == null){
+                                    DBmanager.Bans.put(UUID.fromString(rtnclss.getObuuid()), inf);
+                                    DBmanager.saveBan(UUID.fromString(rtnclss.getObuuid()));
+                                    DBmanager.Bans.remove(UUID.fromString(rtnclss.getObuuid()));
+                                    r.setCurrentInfraction(inf);
+                                    DBmanager.saveRecord(r);
+                                }else{
+                                    r.getOldInfractions().put(r.getOldInfractions().size()-1, inf);
+                                    DBmanager.saveRecord(r);
+                                }
+                            }
+                            if(!rtnclss.isComplete()){
+                                ServletDBmanager.Incomplete.add(inf);
+                            }
+                            outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
+                            LogUtil.printDebug("wrote: " + EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
                         }else if(req[0].contains("request")){
                             RequestType request = EnforcerSuite.getJSonParser().readValue(req[0], RequestType.class);
                             if(request.getBase().equalsIgnoreCase("archive")){
@@ -351,6 +593,16 @@ public class ServletHandle extends AbstractHandler{
         private String[] args;
         
         public RequestType(){}
+        
+    }
+    
+    public static class ErrorType{
+        @Getter @Setter
+        private String msg;
+        @Getter @Setter
+        private int err;
+        
+        public ErrorType(){}
         
     }
 }

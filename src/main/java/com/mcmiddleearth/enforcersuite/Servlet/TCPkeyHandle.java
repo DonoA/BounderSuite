@@ -83,11 +83,13 @@ public class TCPkeyHandle {
         return false;
     }
     
-    public static boolean validRequest(String Key){
+    public static boolean validRequest(String Key, boolean remove){
         LogUtil.printDebug("checking key "+Key);
         if(ValidKeys.containsKey(Key)){
             if(ValidKeys.get(Key).after(new Date(System.currentTimeMillis() - (12 * 60 * 60 * 1000)))){
-                ValidKeys.remove(Key);
+                if(remove){
+                    ValidKeys.remove(Key);
+                }
                 return true;
             }else{
                 ValidKeys.remove(Key);

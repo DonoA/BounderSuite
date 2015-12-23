@@ -6,7 +6,7 @@
 <div class="sectionMain" id="MainDiv" onload="alert({$up});">
 
 <!-- need to update to not use callbacks -->
-	<li class=scondaryContent obList">
+	<li class="scondaryContent obList">
 		<xen:foreach loop="$obs" value="$ob">
 			<a id={$ob}>
 			{$ob}
@@ -89,7 +89,63 @@ function Reply(complete){
 	         }
 	});
 }
-
+function Add(complete){
+	var evi = [];
+	$('#evidence').children('input').each(function () {
+		if(this.value != ""){
+			evi.push(this.value);
+	    	}
+	});
+	var banTF = ($("#class option:selected").text() == "ban");
+         $.ajax({ 
+		 type: "POST",
+		 url: '/EnforcerSuite/OBFormReturn.php',
+	         data: {arguments: {
+		         type: "add",
+		         name: document.getElementById('name').value,
+		         obuuid: document.getElementById('uuid').value,
+		         enforcer: $("#E0 option:selected").text(),
+		         demoted: new Date(document.getElementById("demoteDate").value).getTime()/1000,
+		         ban: banTF,
+		         sev: $("#sever option:selected").text(),
+		         bannedOn:{
+		         	build: document.getElementById('B0').checked, 
+		         	freebuild: document.getElementById('B1').checked, 
+		         	teamspeak: document.getElementById('B2').checked, 
+		         	forums: document.getElementById('B3').checked, 
+		         	othercheck: document.getElementById('B4').checked, 
+		         	othertxt: document.getElementById('B5').value,
+		         	eauto: document.getElementById('BAuto').checked
+		         },
+		         reasons:{
+		         	blocks: document.getElementById('R0').checked,
+		         	spam: document.getElementById('R1').checked,
+		         	social: document.getElementById('R2').checked,
+		         	ignoring: document.getElementById('R3').checked,
+		         	impersonating: document.getElementById('R4').checked,
+		         	mods: document.getElementById('R5').checked,
+		         	ads: document.getElementById('R6').checked,
+		         	obassist: document.getElementById('R7').checked,
+		         	teamspeak: document.getElementById('R8').checked,
+		         	alt: document.getElementById('R9').checked,
+		         	othercheck: document.getElementById('R10').checked,
+		         	othertxt: document.getElementById('R11').value,
+		         	eauto: document.getElementById('RAuto').checked,
+		         }, 
+		         evidence: evi, 
+		         notes: document.getElementById('notes').value,
+		         complete: complete,
+		         key: "{$key}"
+	         }},
+	         success: function(data) {
+	         	var rtndat = JSON.parse(data);
+	         	alert(rtndat.msg);
+	         	if(rtndat.err==0){
+	         		location.reload();
+	         	}
+	         }
+	});
+}
 $(function(){
 	if({$up} == 0){
 		alert("Unable to reach database (the server is probs down)");

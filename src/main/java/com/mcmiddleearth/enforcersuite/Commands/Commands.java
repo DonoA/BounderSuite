@@ -78,7 +78,7 @@ public class Commands implements CommandExecutor, TabCompleter{
                     Player ob = op.getPlayer();
                     if(!DBmanager.OBs.containsKey(ob.getUniqueId())){
                         ob.teleport(EnforcerSuite.getPlugin().getMainWorld().getSpawnLocation());
-                        Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p, ob.getUniqueId(), ob.getName());
+                        Infraction inf = new Infraction(Integer.parseInt(args[1]), /*PermissionsEx.getUser(ob.getName()).getPrefix()*/ "none", p.getUniqueId(), ob.getUniqueId(), ob.getName());
                         inf.setStarted(true);
                         DBmanager.OBs.put(ob.getUniqueId(), inf);
                         for(int j=0; j <= 3; j++){
@@ -97,7 +97,7 @@ public class Commands implements CommandExecutor, TabCompleter{
                 }else{
                     if(!DBmanager.loadOB(op.getUniqueId())){
                         if(op.hasPlayedBefore()){
-                            Infraction inf = new Infraction(Integer.parseInt(args[1]), "none", p, op.getUniqueId());
+                            Infraction inf = new Infraction(Integer.parseInt(args[1]), "none", p.getUniqueId(), op.getUniqueId());
                             DBmanager.OBs.put(op.getUniqueId(), inf);
                             for(int j=0; j <= 3; j++){
                                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "demote " + op.getName());
@@ -143,7 +143,7 @@ public class Commands implements CommandExecutor, TabCompleter{
                         type=2;
                     }
                     if(op.hasPlayedBefore()){
-                        Infraction inf = new Infraction(type, "none", p, op.getUniqueId(), op.getName());
+                        Infraction inf = new Infraction(type, "none", p.getUniqueId(), op.getUniqueId(), op.getName());
                         inf.setBan(true);
                         DBmanager.Bans.put(op.getUniqueId(), inf);
                         DBmanager.saveBan(op.getUniqueId());
@@ -260,7 +260,7 @@ public class Commands implements CommandExecutor, TabCompleter{
                 }
                 p.sendMessage(EnforcerSuite.getPrefix() + "Failed to pardon " + op.getName());
                 return true;
-            }else if(cmd.getName().equalsIgnoreCase("suitetool") && p.isOp() && args.length>0){
+            }else if(cmd.getName().equalsIgnoreCase("suitetool") && p.isOp() && args.length>0 && EnforcerSuite.isDebug()){
                 if(args[0].equalsIgnoreCase("dest") && DBmanager.OBs.containsKey(p.getUniqueId())){
                     p.teleport(DBmanager.OBs.get(p.getUniqueId()).getDestination().getCenter());
                 }else if(args[0].equalsIgnoreCase("unban") && args.length >= 2){
