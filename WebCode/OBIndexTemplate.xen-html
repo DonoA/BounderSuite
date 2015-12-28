@@ -10,13 +10,13 @@ User Lookup: <input type="text" id="find"> <button onClick="getSearch()">Find</b
 	Current:
 	<br />
 	<xen:foreach loop="$obc" value="$s">
-		{$s} <button onClick="getView('record/-/{$s}')">view</button> <xen:if is="{$mod} == 1"><button onClick="getEdit('{$s}')">Edit</button> </xen:if>
+		{$s} <button onClick="getView('record/-/{$s}')">view</button>
 		<br />
 	</xen:foreach>
 	Archive:
 	<br />
 	<xen:foreach loop="$oba" value="$s">
-		{$s} <button onClick="getView('record/-/{$s}')">view</button> <xen:if is="{$mod} == 1"><button onClick="getEdit('{$s}')">Edit</button> </xen:if>
+		{$s} <button onClick="getView('record/-/{$s}')">view</button>
 		<br />
 	</xen:foreach>
 	</hr>
@@ -26,13 +26,13 @@ User Lookup: <input type="text" id="find"> <button onClick="getSearch()">Find</b
 	Current:
 	<br />
 	<xen:foreach loop="$banc" value="$s">
-		{$s} <button onClick="getView('record/-/{$s}')">view</button> <xen:if is="{$mod} == 1"><button onClick="getEdit('{$s}')">Edit</button> </xen:if>
+		{$s} <button onClick="getView('record/-/{$s}')">view</button>
 		<br />
 	</xen:foreach>
 	Archive:
 	<br />
 	<xen:foreach loop="$bana" value="$s">
-		{$s} <button onClick="getView('record/-/{$s}')">view</button> <xen:if is="{$mod} == 1"><button onClick="getEdit('{$s}')">Edit</button> </xen:if>
+		{$s} <button onClick="getView('record/-/{$s}')">view</button>
 		<br />
 	</xen:foreach>
 </div>
@@ -44,20 +44,23 @@ function getView(name){
 	 url: '/EnforcerSuite/OBFormReturn.php',
          data: {arguments: {
          type: "fetch",
-         param: name
+         param: name,
+         key: "{$key}"
          }},
          success: function(data) {
          	document.getElementById('MainDiv').innerHTML = data;
          }
          })
 } 
-function getEdit(name){
+function getEdit(name, ed){
 	$.ajax({ 
 	 type: "POST",
 	 url: '/EnforcerSuite/OBFormReturn.php',
          data: {arguments: {
          type: "fetch",
-         param: name
+         param: name,
+         version: ed,
+         key: "{$key}"
          }},
          success: function(data) {
          	document.getElementById('MainDiv').innerHTML = data;
@@ -71,11 +74,60 @@ function getSearch(){
 	 url: '/EnforcerSuite/OBFormReturn.php',
          data: {arguments: {
          type: "search",
-         param: name
+         param: name,
+         key: "{$key}"
          }},
          success: function(data) {
          	document.getElementById('MainDiv').innerHTML = data;
          }
          })
+}
+function Reply(complete){
+	var evi = [];
+	$('#evidence').children('input').each(function () {
+		if(this.value != ""){
+			evi.push(this.value);
+	    	}
+	});
+         $.ajax({ 
+		 type: "POST",
+		 url: '/EnforcerSuite/OBFormReturn.php',
+	         data: {arguments: {
+		         type: "update",
+		         obuuid: document.getElementById('obuuid').innerHTML,
+		         bannedOn:{
+		         	build: document.getElementById('B0').checked, 
+		         	freebuild: document.getElementById('B1').checked, 
+		         	teamspeak: document.getElementById('B2').checked, 
+		         	forums: document.getElementById('B3').checked, 
+		         	othercheck: document.getElementById('B4').checked, 
+		         	othertxt: document.getElementById('B5').value,
+		         	eauto: false
+		         },
+		         reasons:{
+		         	blocks: document.getElementById('R0').checked,
+		         	spam: document.getElementById('R1').checked,
+		         	social: document.getElementById('R2').checked,
+		         	ignoring: document.getElementById('R3').checked,
+		         	impersonating: document.getElementById('R4').checked,
+		         	mods: document.getElementById('R5').checked,
+		         	ads: document.getElementById('R6').checked,
+		         	obassist: document.getElementById('R7').checked,
+		         	teamspeak: document.getElementById('R8').checked,
+		         	alt: document.getElementById('R9').checked,
+		         	othercheck: document.getElementById('R10').checked,
+		         	othertxt: document.getElementById('R11').value,
+		         	eauto: false
+		         }, 
+		         evidence: evi, 
+		         notes: document.getElementById('notes').value,
+		         complete: complete,
+		         key: "{$key}"
+	         }},
+	         success: function(data) {
+	         	alert(data);
+	         	location.reload();
+	         }
+	});
 }
 </script>

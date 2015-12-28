@@ -34,7 +34,8 @@ function Fetch(param){
 		 url: '/EnforcerSuite/OBFormReturn.php',
 	         data: {arguments: {
 		         type: "fetch",
-		         param: param
+		         param: param,
+		         key: "nil"
 	         }},
 	         success: function(data) {
 	         	document.getElementById('MainDiv').innerHTML = data;
@@ -61,7 +62,7 @@ function Reply(complete){
 		         	forums: document.getElementById('B3').checked, 
 		         	othercheck: document.getElementById('B4').checked, 
 		         	othertxt: document.getElementById('B5').value,
-		         	eauto: document.getElementById('BAuto').checked
+		         	eauto: false
 		         },
 		         reasons:{
 		         	blocks: document.getElementById('R0').checked,
@@ -76,7 +77,7 @@ function Reply(complete){
 		         	alt: document.getElementById('R9').checked,
 		         	othercheck: document.getElementById('R10').checked,
 		         	othertxt: document.getElementById('R11').value,
-		         	eauto: document.getElementById('RAuto').checked,
+		         	eauto: false
 		         }, 
 		         evidence: evi, 
 		         notes: document.getElementById('notes').value,
@@ -152,4 +153,19 @@ $(function(){
 		window.history.go(-1)
 	}
 });
+function getEdit(name, ed){
+	$.ajax({ 
+	 type: "POST",
+	 url: '/EnforcerSuite/OBFormReturn.php',
+         data: {arguments: {
+         type: "fetch",
+         param: name,
+         version: ed,
+         key: "{$key}"
+         }},
+         success: function(data) {
+         	document.getElementById('MainDiv').innerHTML = data;
+         }
+         })
+}
 </script>
