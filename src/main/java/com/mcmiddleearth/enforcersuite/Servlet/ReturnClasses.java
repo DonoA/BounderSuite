@@ -221,4 +221,15 @@ public class ReturnClasses {
             public reasons(){}
         }
     }
+    
+    public static class Search{
+        @Getter @Setter
+        private String type;
+        @Getter @Setter
+        private String param;
+        @Getter @Setter
+        private String key;
+        
+        public Search(){}
+    }
 }

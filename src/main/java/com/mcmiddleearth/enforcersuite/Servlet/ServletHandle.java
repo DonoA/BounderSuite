@@ -106,7 +106,7 @@ public class ServletHandle extends AbstractHandler{
         }
     }
     
-    public static class TCPconnect extends Thread {
+    public static class TCPconnect extends Thread { // !!TODO DEBUG Infinate loop somewhere in this thread, has to do with saving from new or editing from index
         
         @Override
         public void run() {
@@ -157,8 +157,6 @@ public class ServletHandle extends AbstractHandler{
                                 List<String> hold = ServletDBmanager.getOBs(false);
                                 hold.removeAll(ServletDBmanager.getOBs(true));
                                 bag.put("Archived", new ArrayList<String>(hold));
-                                hold = ServletDBmanager.getOBs(true);
-                                hold.removeAll(ServletDBmanager.getOBs(false));
                                 toSend.put("OBs", bag);
                                 //bans
                                 bag =  new HashMap<String, ArrayList<String>>();
@@ -175,13 +173,73 @@ public class ServletHandle extends AbstractHandler{
                                 LogUtil.printDebug("wrote: "+EnforcerSuite.getJSonParser().writeValueAsString(DBmanager.getRecord(UUID.fromString(uuid))));
                                 outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(DBmanager.getRecord(UUID.fromString(uuid))));
                             }else{
-                                for(Infraction inf : ServletDBmanager.Incomplete){
-                                    if(req[1].contains(inf.getOBuuid().toString())){
-                                        LogUtil.printDebug("sent: " + EnforcerSuite.getJSonParser().writeValueAsString(inf));
-                                        outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(inf));
+                                if(req.length == 2){
+                                    for(Infraction inf : ServletDBmanager.Incomplete){
+                                        if(req[1].contains(inf.getOBuuid().toString())){
+                                            LogUtil.printDebug("sent: " + EnforcerSuite.getJSonParser().writeValueAsString(inf));
+                                            outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(inf));
+                                        }
                                     }
+                                }else{
+                                    Record rcrd = DBmanager.getRecord(UUID.fromString(req[1]));
+                                    int version = Integer.parseInt(req[2]);
+                                    
+                                    Infraction inf;
+                                    if(version == -1){
+                                        inf = rcrd.getCurrentInfraction();
+                                    }else{
+                                        inf = rcrd.getOldInfractions().get(version);
+                                    }
+                                    outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(inf));
                                 }
                             }
+                        }else if(req[0].equalsIgnoreCase("search")){
+                            HashMap<String, HashMap<String, ArrayList<String>>> toSend = new HashMap<String, HashMap<String, ArrayList<String>>>();
+                            HashMap<String, ArrayList<String>> bag =  new HashMap<String, ArrayList<String>>();
+                            String term = EnforcerSuite.getJSonParser().readValue(req[1], ReturnClasses.Search.class).getParam();
+                            List<String> hold;
+                            //obs
+                            hold = ServletDBmanager.getOBs(true);
+                            for(String s : new ArrayList<String>(hold)){
+                                if(!s.contains(term)){
+                                    hold.remove(s);
+                                    LogUtil.printDebug("removed: " + s);
+                                }
+                            }
+                            bag.put("Current", new ArrayList<String>(hold));
+                            hold = ServletDBmanager.getOBs(false);
+                            hold.removeAll(ServletDBmanager.getOBs(true));
+                            for(String s : new ArrayList<String>(hold)){
+                                if(!s.contains(term)){
+                                    hold.remove(s);
+                                    LogUtil.printDebug("removed: " + s);
+                                }
+                            }
+                            bag.put("Archived", new ArrayList<String>(hold));
+                            toSend.put("OBs", bag);
+                            //bans
+                            bag =  new HashMap<String, ArrayList<String>>();
+                            hold = ServletDBmanager.getBans(true);
+                            for(String s : new ArrayList<String>(hold)){
+                                if(!s.contains(term)){
+                                    hold.remove(s);
+                                    LogUtil.printDebug("removed: " + s);
+                                }
+                            }
+                            bag.put("Current", new ArrayList<String>(hold));
+                            hold = ServletDBmanager.getBans(false);
+                            hold.removeAll(ServletDBmanager.getBans(true));
+                            for(String s : new ArrayList<String>(hold)){
+                                if(!s.contains(term)){
+                                    hold.remove(s);
+                                    LogUtil.printDebug("removed: " + s);
+                                }
+                            }
+                            bag.put("Archived", new ArrayList<String>(hold));
+                            toSend.put("Bans", bag);
+                            //send
+                            outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(toSend));
+                            LogUtil.printDebug(EnforcerSuite.getJSonParser().writeValueAsString(toSend));
                         }else if(req[0].equalsIgnoreCase("return")){
                             ReturnClasses.Update rtnclss = EnforcerSuite.getJSonParser().readValue(req[1], ReturnClasses.Update.class);
                             if(!TCPkeyHandle.validRequest(rtnclss.getKey(), true)){
@@ -208,21 +266,25 @@ public class ServletHandle extends AbstractHandler{
                             //bans
                             if(rtnclss.getBannedOn().isBuild()){
                                 inf.getBannedOn().add("build");
-                                if(rtnclss.getBannedOn().isEauto()){
-                                    //ban them
+//                                if(rtnclss.getBannedOn().isEauto()){
+                                Bukkit.getOfflinePlayer(inf.getOBuuid()).setBanned(true);
+//                                }
+                            }else{
+                                if(Bukkit.getOfflinePlayer(inf.getOBuuid()).isBanned()){
+                                    Bukkit.getOfflinePlayer(inf.getOBuuid()).setBanned(false);
                                 }
                             }
                             if(rtnclss.getBannedOn().isFreebuild()){
                                 inf.getBannedOn().add("freebuild");
-                                if(rtnclss.getBannedOn().isEauto()){
-                                    //ban them
-                                }
+//                                if(rtnclss.getBannedOn().isEauto()){
+//                                    //ban them
+//                                }
                             }
                             if(rtnclss.getBannedOn().isTeamspeak()){
                                 inf.getBannedOn().add("teamspeak");
-                                if(rtnclss.getBannedOn().isEauto()){
-                                    //ban them
-                                }
+//                                if(rtnclss.getBannedOn().isEauto()){
+//                                    //ban them
+//                                }
                             }
                             if(rtnclss.getBannedOn().isForums()){
                                 inf.getBannedOn().add("forums");
@@ -233,15 +295,15 @@ public class ServletHandle extends AbstractHandler{
                             //reasons
                             if(rtnclss.getReasons().isBlocks()){
                                 inf.getReasons().add("Unauthorised Block Break/Place");
-                                if(rtnclss.getReasons().isEauto()){
-                                    //Collect Evidence
-                                }
+//                                if(rtnclss.getReasons().isEauto()){
+//                                    //Collect Evidence
+//                                }
                             }
                             if(rtnclss.getReasons().isSpam()){
                                 inf.getReasons().add("Spamming Chat");
-                                if(rtnclss.getReasons().isEauto()){
-                                    //Collect Evidence
-                                }
+//                                if(rtnclss.getReasons().isEauto()){
+//                                    //Collect Evidence
+//                                }
                             }
                             if(rtnclss.getReasons().isSocial()){
                                 inf.getReasons().add("Social Indiscretion (Inappropriate Username, Profane/Derogatory Language, "
@@ -258,15 +320,15 @@ public class ServletHandle extends AbstractHandler{
                             }
                             if(rtnclss.getReasons().isAds()){
                                 inf.getReasons().add("Advertising");
-                                if(rtnclss.getReasons().isEauto()){
-                                    //Collect Evidence
-                                }
+//                                if(rtnclss.getReasons().isEauto()){
+//                                    //Collect Evidence
+//                                }
                             }
                             if(rtnclss.getReasons().isObassist()){
                                 inf.getReasons().add("Assisting Oathbreakers");
-                                if(rtnclss.getReasons().isEauto()){
-                                    //Collect Evidence
-                                }
+//                                if(rtnclss.getReasons().isEauto()){
+//                                    //Collect Evidence
+//                                }
                             }
                             if(rtnclss.getReasons().isTeamspeak()){
                                 inf.getReasons().add("TeamSpeak (Infractions)");
