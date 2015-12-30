@@ -118,6 +118,7 @@ public class ServletHandle extends AbstractHandler{
                 List<String> rtn = new ArrayList<>();
                 ServletDBmanager.loadIncomplete();
                 while(true){
+                    origin:
                     try (Socket connectionSocket = welcomeSocket.accept()) {
                         BufferedReader inFromClient =
                                 new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
@@ -241,26 +242,47 @@ public class ServletHandle extends AbstractHandler{
                             outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(toSend));
                             LogUtil.printDebug(EnforcerSuite.getJSonParser().writeValueAsString(toSend));
                         }else if(req[0].equalsIgnoreCase("return")){
-                            ReturnClasses.Update rtnclss = EnforcerSuite.getJSonParser().readValue(req[1], ReturnClasses.Update.class);
+                            ReturnClasses.Update rtnclss = null;
+                            boolean arch = false;
+                            int infid = -10;
+                            try{
+                                rtnclss = EnforcerSuite.getJSonParser().readValue(req[1], ReturnClasses.Update.class);
+                            }catch(Exception ex){
+                                ReturnClasses.UpdateArchive rtnarch = EnforcerSuite.getJSonParser().readValue(req[1], ReturnClasses.UpdateArchive.class);
+                                arch = true;
+                                infid = rtnarch.getInfid();
+                                rtnclss = new ReturnClasses.Update(rtnarch);
+                            }
                             if(!TCPkeyHandle.validRequest(rtnclss.getKey(), true)){
                                 outToClient.writeBytes("Invalid key!");
-                                return;
+                                break origin;
                             }else{
                                 outToClient.writeBytes("All changes saved!");
                             }
-                            Infraction[] infs = new Infraction[ServletDBmanager.Incomplete.size()];
-                            ServletDBmanager.Incomplete.toArray(infs);
                             Infraction inf = null;
-                            for(Infraction i : infs){
-                                if(req[1].contains(i.getOBuuid().toString())){
-                                    inf = i;
-                                    if(rtnclss.isComplete()){
-                                        ServletDBmanager.Incomplete.remove(i);
+                            if(arch){
+                                Record rcrd = DBmanager.getRecord(UUID.fromString(rtnclss.getObuuid()));
+                                if(infid == -1){
+                                    inf = rcrd.getCurrentInfraction();
+                                }else{
+                                    inf = rcrd.getOldInfractions().get(infid);
+                                }
+                            } else {
+                                Infraction[] infs = new Infraction[ServletDBmanager.Incomplete.size()];
+                                ServletDBmanager.Incomplete.toArray(infs);
+                                for(Infraction i : infs){
+                                    if(req[1].contains(i.getOBuuid().toString())){
+                                        inf = i;
+                                        if(rtnclss.isComplete()){
+                                            ServletDBmanager.Incomplete.remove(i);
+                                        }
                                     }
                                 }
                             }
-                            if(inf == null)
-                                return;
+                            if(inf == null){
+                                LogUtil.printDebug("NULL Break!"); 
+                                break origin;
+                            }
                             inf.getBannedOn().clear();
                             inf.getReasons().clear();
                             //bans
@@ -341,15 +363,47 @@ public class ServletHandle extends AbstractHandler{
                             }
                             inf.setEvidence(new ArrayList<String>(Arrays.asList(rtnclss.getEvidence())));
                             inf.setNotes(rtnclss.getNotes());
-                            if(!inf.isBan()){
-                                if(DBmanager.OBs.containsKey(UUID.fromString(rtnclss.getObuuid()))){
-                                    Infraction saved = DBmanager.OBs.get(UUID.fromString(rtnclss.getObuuid()));
-                                    inf.setDone(saved.isDone());
-                                    inf.setFinished(saved.getFinished());
-                                    inf.setRePromoted(saved.isRePromoted());
-                                    inf.setStarted(saved.isStarted());
-                                    DBmanager.OBs.put(UUID.fromString(rtnclss.getObuuid()), inf);
-                                    DBmanager.saveOB(UUID.fromString(rtnclss.getObuuid()));
+                            if(arch){
+                                Record rcrd = DBmanager.getRecord(inf.getOBuuid());
+                                if(infid == -1){
+                                    rcrd.setCurrentInfraction(inf);
+                                }else{
+                                    rcrd.getOldInfractions().put(infid, inf);
+                                }
+                                DBmanager.saveRecord(rcrd);
+                            }else{
+                                if(!inf.isBan()){
+                                    if(DBmanager.OBs.containsKey(UUID.fromString(rtnclss.getObuuid()))){
+                                        Infraction saved = DBmanager.OBs.get(UUID.fromString(rtnclss.getObuuid()));
+                                        inf.setDone(saved.isDone());
+                                        inf.setFinished(saved.getFinished());
+                                        inf.setRePromoted(saved.isRePromoted());
+                                        inf.setStarted(saved.isStarted());
+                                        DBmanager.OBs.put(UUID.fromString(rtnclss.getObuuid()), inf);
+                                        DBmanager.saveOB(UUID.fromString(rtnclss.getObuuid()));
+                                    }else{
+                                        Record r = DBmanager.getRecord(UUID.fromString(rtnclss.getObuuid()));
+                                        Infraction saved = null;
+                                        if(r.getCurrentInfraction() == null){
+                                            saved = r.getOldInfractions().get(r.getOldInfractions().size()-1);
+                                        }else{
+                                            saved = r.getCurrentInfraction();
+                                        }
+                                        inf.setDone(saved.isDone());
+                                        inf.setFinished(saved.getFinished());
+                                        inf.setRePromoted(saved.isRePromoted());
+                                        inf.setStarted(saved.isStarted());
+                                        if(inf.getFinished() == null){
+                                            DBmanager.OBs.put(UUID.fromString(rtnclss.getObuuid()), inf);
+                                            DBmanager.saveOB(UUID.fromString(rtnclss.getObuuid()));
+                                            DBmanager.OBs.remove(UUID.fromString(rtnclss.getObuuid()));
+                                            r.setCurrentInfraction(inf);
+                                            DBmanager.saveRecord(r);
+                                        }else{
+                                            r.getOldInfractions().put(r.getOldInfractions().size()-1, inf);
+                                            DBmanager.saveRecord(r);
+                                        }
+                                    }
                                 }else{
                                     Record r = DBmanager.getRecord(UUID.fromString(rtnclss.getObuuid()));
                                     Infraction saved = null;
@@ -363,37 +417,15 @@ public class ServletHandle extends AbstractHandler{
                                     inf.setRePromoted(saved.isRePromoted());
                                     inf.setStarted(saved.isStarted());
                                     if(inf.getFinished() == null){
-                                        DBmanager.OBs.put(UUID.fromString(rtnclss.getObuuid()), inf);
-                                        DBmanager.saveOB(UUID.fromString(rtnclss.getObuuid()));
-                                        DBmanager.OBs.remove(UUID.fromString(rtnclss.getObuuid()));
+                                        DBmanager.Bans.put(UUID.fromString(rtnclss.getObuuid()), inf);
+                                        DBmanager.saveBan(UUID.fromString(rtnclss.getObuuid()));
+                                        DBmanager.Bans.remove(UUID.fromString(rtnclss.getObuuid()));
                                         r.setCurrentInfraction(inf);
                                         DBmanager.saveRecord(r);
                                     }else{
                                         r.getOldInfractions().put(r.getOldInfractions().size()-1, inf);
                                         DBmanager.saveRecord(r);
                                     }
-                                }
-                            }else{
-                                Record r = DBmanager.getRecord(UUID.fromString(rtnclss.getObuuid()));
-                                Infraction saved = null;
-                                if(r.getCurrentInfraction() == null){
-                                    saved = r.getOldInfractions().get(r.getOldInfractions().size()-1);
-                                }else{
-                                    saved = r.getCurrentInfraction();
-                                }
-                                inf.setDone(saved.isDone());
-                                inf.setFinished(saved.getFinished());
-                                inf.setRePromoted(saved.isRePromoted());
-                                inf.setStarted(saved.isStarted());
-                                if(inf.getFinished() == null){
-                                    DBmanager.Bans.put(UUID.fromString(rtnclss.getObuuid()), inf);
-                                    DBmanager.saveBan(UUID.fromString(rtnclss.getObuuid()));
-                                    DBmanager.Bans.remove(UUID.fromString(rtnclss.getObuuid()));
-                                    r.setCurrentInfraction(inf);
-                                    DBmanager.saveRecord(r);
-                                }else{
-                                    r.getOldInfractions().put(r.getOldInfractions().size()-1, inf);
-                                    DBmanager.saveRecord(r);
                                 }
                             }
                         }else if(req[0].equalsIgnoreCase("add")){
@@ -403,7 +435,7 @@ public class ServletHandle extends AbstractHandler{
                                 rtnmsg.setMsg("Invalid key!");
                                 rtnmsg.setErr(1);
                                 outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
-                                return;
+                                break origin;
                             }
                             Infraction[] infs = new Infraction[ServletDBmanager.Incomplete.size()];
                             ServletDBmanager.Incomplete.toArray(infs);
@@ -431,7 +463,7 @@ public class ServletHandle extends AbstractHandler{
                                         rtnmsg.setMsg(ob.getName() + " is already OB!");
                                         rtnmsg.setErr(1);
                                         outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
-                                        return;
+                                        break origin;
                                     }
                                 }else{
                                     if(!DBmanager.loadOB(op.getUniqueId())){
@@ -449,14 +481,14 @@ public class ServletHandle extends AbstractHandler{
                                             rtnmsg.setMsg("That Player has never played before");
                                             rtnmsg.setErr(1);
                                             outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
-                                            return;
+                                            break origin;
                                         }
                                     }else{
                                         DBmanager.OBs.remove(op.getUniqueId());
                                         rtnmsg.setMsg("That player is already OB!");
                                         rtnmsg.setErr(1);
                                         outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
-                                        return;
+                                        break origin;
                                     }
                                 }
                             }else if(rtnclss.isBan()){
@@ -482,13 +514,13 @@ public class ServletHandle extends AbstractHandler{
                                         rtnmsg.setMsg("That Player has never played before");
                                         rtnmsg.setErr(1);
                                         outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
-                                        return;
+                                        break origin;
                                     }
                                 }else{
                                     rtnmsg.setMsg(op.getName() + " is already Banned!");
                                     rtnmsg.setErr(1);
                                     outToClient.writeBytes(EnforcerSuite.getJSonParser().writeValueAsString(rtnmsg));
-                                    return;
+                                    break origin;
                                 }
                             }
                             inf.getBannedOn().clear();

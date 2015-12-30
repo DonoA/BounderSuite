@@ -67,8 +67,8 @@
         $obcur = $obdat->currentInfraction;
 				$data = str_replace('"',"&quot;",$data);
         $newDiv = "<p>This player has been punished ".count((array) $obrec)." times in the past</p><br/>".
-        "<p>This player has gone by the name(s): ".implode(", ", $obdat->names)."</p><br/>".
-        "<p>Their UUID is: ".$obdat->ob."</p><br/>".
+        "<p>This player has gone by the name(s): ".htmlspecialchars(implode(", ", $obdat->names))."</p><br/>".
+        "<p>Their UUID is: ".htmlspecialchars($obdat->ob)."</p><br/>".
         "<p>This player ".(empty($obcura)? "does not have a current infraction": "currently has an infration");
         if(!empty($obcura)){
           $newDiv = $newDiv."<hr /> Current infraction:<br><br>";
@@ -83,8 +83,12 @@
               $newDiv = $newDiv."This OB was ".($obcur->severity == 1? "first": "second")." degree <br /><br />";
               $newDiv = $newDiv."The player was OBed for ".implode(", ",$obcur->reasons)."<br /><br />";
           }
-          $newDiv = $newDiv."The infraction occured on: ".date("Y-m-d H:i:s", $obcur->demotion/1000);
+          $newDiv = $newDiv."The infraction occured on: ".gmdate("Y-m-d H:i:s", $obcur->demotion/1000);
           $newDiv = $newDiv."<br />";
+          if($_POST['arguments']['key'] != 'nil'){
+            $newDiv = $newDiv."Provided evidence: ".htmlspecialchars(implode(", ",$obcur->evidence));
+            $newDiv = $newDiv."<br />Notes: ".htmlspecialchars($obcur->notes);
+          }
         }
 
         for($i = count((array) $obrec) -1; $i >= 0; $i--){
@@ -101,12 +105,17 @@
                 $newDiv = $newDiv."This OB was ".($rec->severity == 1? "first": "second")." degree <br /><br />";
                 $newDiv = $newDiv."The player was OBed for ".implode(", ",$rec->reasons)."<br /><br />";
             }
-            $newDiv = $newDiv."The infraction occured on: ".date("Y-m-d H:i:s", $rec->demotion/1000);
+            $newDiv = $newDiv."The infraction occured on: ".gmdate("Y-m-d H:i:s", $rec->demotion/1000);
             $newDiv = $newDiv."<br />";
+            if($_POST['arguments']['key'] != 'nil'){
+              $newDiv = $newDiv."Provided evidence: ".htmlspecialchars(implode(", ", $rec->evidence));
+              $newDiv = $newDiv."<br />Notes: ".htmlspecialchars($rec->notes);
+            }
         }
 				echo $newDiv."<br />";//.$data;
 			}else{
-        if(!empty($_POST['arguments']['version'])){
+        $data = "";
+        if(isset($_POST['arguments']['version'])){
           $data = 'fetch/-/'.$param.'/-/'.$_POST['arguments']['version'].PHP_EOL;
         }else{
           $data = 'fetch/-/'.$param.PHP_EOL;
@@ -120,20 +129,23 @@
 				else {
 					fwrite($fp, $data);
 					while (! feof($fp)) {
-						$data = fgets($fp, 4096);
-						$obdat = json_decode($data);
+						$dat = fgets($fp, 4096);
+						$obdat = json_decode($dat);
 					}
 					fclose($fp);
 				}
 				$bginfo = "";
+        if(isset($_POST['arguments']['version'])){
+          $bginfo = $bginfo."Infration id: <a id=infid>".$_POST['arguments']['version']."</a><br>";
+        }
 				if($obdat->obname == null){
-					$bginfo = "Name: Unknown <br>";
+					$bginfo = $bginfo."Name: Unknown <br>";
 				}else{
-					$bginfo = "Name: ".$obdat->obname." <br>";
+					$bginfo = $bginfo."Name: ".htmlspecialchars($obdat->obname)." <br>";
 				}
-				$bginfo = $bginfo."UUID: <a id=obuuid>".$obdat->obuuid."</a> <br>";
+				$bginfo = $bginfo."UUID: <a id=obuuid>".htmlspecialchars($obdat->obuuid)."</a> <br>";
 				$bginfo = $bginfo."Date Demoted: ".gmdate("d M Y H:i:s", $obdat->demotion)." <br>";
-				$bginfo = $bginfo."Destination: ".$obdat->destination->name." <br>";
+				$bginfo = $bginfo."Destination: ".htmlspecialchars($obdat->destination->name)." <br>";
 				if($obdat->started){
 					$bginfo = $bginfo."Started: True <br>";
 				}else{
@@ -191,7 +203,7 @@
                     '<textarea rows="7" cols="100" id="notes" style="width:500px;height:200px">'.$obdat->notes.'</textarea>'.
                     '<p></p>'.
                     '<br><br><button type=button onclick=Reply(false)>Update</button><br/><br/>';
-                    if(empty($_POST['arguments']['version'])){
+                    if(!isset($_POST['arguments']['version'])){
                       $newDiv = $newDiv.'<button type=button onclick=Reply(true)>Complete</button>';
                     }
 				echo $newDiv;

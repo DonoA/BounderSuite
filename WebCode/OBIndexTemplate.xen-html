@@ -95,6 +95,7 @@ function Reply(complete){
 	         data: {arguments: {
 		         type: "update",
 		         obuuid: document.getElementById('obuuid').innerHTML,
+		         infid: document.getElementById('infid').innerHTML,
 		         bannedOn:{
 		         	build: document.getElementById('B0').checked, 
 		         	freebuild: document.getElementById('B1').checked, 
